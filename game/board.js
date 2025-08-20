@@ -1,5 +1,4 @@
-import Math;
-import LETTER_FREQUENCY from "letterfrequency.js";
+import LETTER_FREQUENCY from "./letterfrequency.js";
 
 var Tile = function(letter, x, y) {
     this.letter = letter;
@@ -8,12 +7,20 @@ var Tile = function(letter, x, y) {
     this.status = "none"; // hover, click, valid, invalid
 };
 
-Tile.prototype.updateStatus = function(status) {
-    this.status = status;
+Tile.prototype.getX = function() {
+    return this.x;
 };
 
-Tile.prototype.generateImgPath = function() {
-    
+Tile.prototype.getY = function() {
+    return this.y;
+};
+
+Tile.prototype.getStatus = function() {
+    return this.status;
+};
+
+Tile.prototype.updateStatus = function(status) {
+    this.status = status;
 };
 
 var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfilled, 1 for filled
@@ -26,7 +33,7 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.currentHover = []; // length 2, row and col
 };
 
-Board.prototype.generateLetters() = function(letters = []) {
+Board.prototype.generateLetters = function(letters = []) {
     for (var row = 0; row < this.board.length; row++) {
         for (var col = 0; col < this.board[0].length; col++) {
             if (this.board[row][col] === 1) { // only make tiles at 
@@ -43,11 +50,12 @@ Board.prototype.generateLetters() = function(letters = []) {
     }
 };
 
-Board.prototype.updateTiles() = function(mouseStatus, mouseRow, mouseCol) {
+Board.prototype.updateTiles = function(mouseStatus, mouseRow, mouseCol) {
     // needs to know which tile is being interacted with at call time
     for (var row = 0; row < this.board.length; row++) {
-        for (var col = 0; col < this.board.length; col++) {
-            if ((row !== mouseRow || col !== mouseCol) && this.board[row][col].status === hover)
+        for (var col = 0; col < this.board[0].length; col++) {
+            break;
+            //if ((row !== mouseRow || col !== mouseCol) && this.board[row][col].status === hover)
         }
     }
     if (Board[row][col] !== 0) {
@@ -62,19 +70,25 @@ Board.prototype.updateTiles() = function(mouseStatus, mouseRow, mouseCol) {
     }
 };
 
-Board.prototype.clearGuess() = function() { // call every time mouse is released
+Board.prototype.clearGuess = function() { // call every time mouse is released
     Board.evaluateGuess();
     Board.currentWord = [];
 };
 
-Board.prototype.evaluateGuess() = function() {
+Board.prototype.evaluateGuess = function() {
     // we will see
+};
+
+Board.prototype.getTiles = function() {
+    return this.board;
 };
 
 Board.prototype.active = function() { // making a word = active, still hovering = inactive
     return this.currentWord.length !== 0;
 };
 
-Board.prototype.dim() = function() {
+Board.prototype.dim = function() {
     return this.board.length;
 };
+
+export {Tile, Board};
