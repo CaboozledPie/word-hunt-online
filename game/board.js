@@ -1,18 +1,18 @@
 import {LETTER_FREQUENCY} from "./letterfrequency.js";
 
-var Tile = function(letter, x, y) {
+var Tile = function(letter, row, col) {
     this.letter = letter;
-    this.x = x; // x/y are based only on row/col! not pixels!
-    this.y = y;
+    this.row = row; 
+    this.col = col;
     this.status = "none"; // hover, click, valid, invalid
 };
 
-Tile.prototype.getX = function() {
-    return this.x;
+Tile.prototype.getRow = function() {
+    return this.row;
 };
 
-Tile.prototype.getY = function() {
-    return this.y;
+Tile.prototype.getCol = function() {
+    return this.col;
 };
 
 Tile.prototype.getStatus = function() {
@@ -30,7 +30,7 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.board = shape;
     this.skin = skin;
     this.currentWord = []; // array of arrays of length 2 [row, col]
-    this.currentHover = []; // length 2, row and col
+    this.currentTile = []; // length 2, row and col
 };
 
 Board.prototype.generateLetters = function(letters = []) {
@@ -50,33 +50,52 @@ Board.prototype.generateLetters = function(letters = []) {
     }
 };
 
-Board.prototype.updateTiles = function(mouseStatus, mouseRow, mouseCol) {
+Board.prototype.updateTile = function(status, row, col) {
     // needs to know which tile is being interacted with at call time
-    for (var row = 0; row < this.board.length; row++) {
-        for (var col = 0; col < this.board[0].length; col++) {
-            break;
-            //if ((row !== mouseRow || col !== mouseCol) && this.board[row][col].status === hover)
-        }
-    }
-    if (Board[row][col] !== 0) {
-        switch (status) {
-            case "hover":
-                this.board[row][col].updateStatus("hover");
-                break;
-            case "click":
-                this.board[row][col].updateStatus("click");
-                break;
-        }
+    if (this.getTile(row, col) !== 0) {
+        this.getTile(row, col).updateStatus(status);
     }
 };
 
+Board.prototype.newHover = function(row, col) {
+    if (this.currentTile.length == 2) { // if no currentTile then we'll have index error
+        this.updateTile("none", this.currentTile[0], this.currentTile[1]);
+    }
+    this.currentTile = [row, col];
+    this.updateTile("hover", row, col);
+};
+
+Board.prototype.selectTile = function(row, col) {
+    // make sure you don't double select
+    for (var i = 0; i < this.currentWord.length; i++) {
+        if (this.currentWord[i].getRow() === row && this.currentWord[i].getCol() === col) {
+            return; // can't select
+        }
+    }
+    this.updateTile("click", row, col);
+    this.currentWord.push(this.getTile(row, col));
+}
+
 Board.prototype.clearGuess = function() { // call every time mouse is released
-    Board.evaluateGuess();
-    Board.currentWord = [];
+    // points?
+    this.evaluateGuess();
+    
+    // reset all tiles
+    for (var i = 0; i < this.currentWord.length; i++) {
+        this.updateTile("none", this.currentWord[i].getRow(), this.currentWord[i].getCol());
+    }
+
+    //reset word
+    this.currentWord = [];
 };
 
 Board.prototype.evaluateGuess = function() {
+    return;
     // we will see
+};
+
+Board.prototype.getTile = function(row, col) {
+    return this.board[row][col];
 };
 
 Board.prototype.getTiles = function() {
