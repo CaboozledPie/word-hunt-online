@@ -68,13 +68,21 @@ function draw() {
         for (var col = 0; col < tileInfo[0].length; col++) {
             const tile = tileInfo[row][col];
             
-            const drawX = offset + tile.getCol() * tileSize;
-            const drawY = offset + tile.getRow() * tileSize;
+            const drawX = tile.getCol() * tileSize;
+            const drawY = tile.getRow() * tileSize;
             
+            // img texture first
             const img = tileSkin[tile.getStatus()];
             if (img.complete) { // make sure img loaded
-                ctx.drawImage(img, drawX, drawY, tileSize - offset * 2, tileSize - offset * 2);
+                ctx.drawImage(img, drawX + offset, drawY + offset, tileSize - offset * 2, tileSize - offset * 2);
             }
+
+            // show letter
+            ctx.fillStyle = "black";
+            ctx.font = "bold 60px Verdana";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle"; // center align text
+            ctx.fillText(tile.getLetter(), drawX + tileSize/2, drawY + tileSize/2 + 5);
         }
     }
 
@@ -130,6 +138,7 @@ function loop() {
 
     if (mouseLeft || mouseIsReleased) { // mouse leaves play area or mouse released
         wordBoard.clearGuess();
+        mouseIsPressed = false; // we should not accidentally drag
     }
     if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
         wordBoard.newHover(mouseTileRow, mouseTileCol);
