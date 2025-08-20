@@ -1,4 +1,4 @@
-import LETTER_FREQUENCY from "./letterfrequency.js";
+import {LETTER_FREQUENCY} from "./letterfrequency.js";
 
 var Tile = function(letter, x, y) {
     this.letter = letter;
