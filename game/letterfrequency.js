@@ -15,3 +15,5 @@ const LETTER_FREQUENCY = [ // SUBJECT TO CHANGE
     "F", "F", "H", "H", "V", "V", "W", "W", "Y", "Y",
     "K", "J", "X", "Q", "Z"
 ]
+
+export {LETTER_FREQUENCY};
