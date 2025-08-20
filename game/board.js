@@ -7,6 +7,10 @@ var Tile = function(letter, row, col) {
     this.status = "none"; // hover, click, valid, invalid
 };
 
+Tile.prototype.getLetter = function() {
+    return this.letter;
+};
+
 Tile.prototype.getRow = function() {
     return this.row;
 };
@@ -31,14 +35,18 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.skin = skin;
     this.currentWord = []; // array of arrays of length 2 [row, col]
     this.currentTile = []; // length 2, row and col
+    this.usedWords = {}; // hashmap for yellow
 };
 
 Board.prototype.generateLetters = function(letters = []) {
+    // make a copy of the frequency so you have a bag w/o replacement
+    var bag = LETTER_FREQUENCY;
     for (var row = 0; row < this.board.length; row++) {
         for (var col = 0; col < this.board[0].length; col++) {
             if (this.board[row][col] === 1) { // only make tiles at 
-                var generateRandom = Math.floor(Math.random() * LETTER_FREQUENCY.length);
-                var generateLetter = LETTER_FREQUENCY[generateRandom];
+                var generateRandom = Math.floor(Math.random() * bag.length);
+                var generateLetter = bag[generateRandom];
+                bag.splice(generateRandom, 1);
                 if (letters.length === this.board.length) { // this trusts that letters is a safe format!
                    this.board[row][col] = new Tile(letters[row][col], row, col); 
                 }
@@ -72,25 +80,61 @@ Board.prototype.selectTile = function(row, col) {
             return; // can't select
         }
     }
-    this.updateTile("click", row, col);
     this.currentWord.push(this.getTile(row, col));
+    
+    // check status of word to determine color
+    for (var i = 0; i < this.currentWord.length; i++) {
+        switch (this.evaluateGuess()) {
+            case 0: // if the new letter ruins the guess
+                this.updateTile("click", this.currentWord[i].getRow(), this.currentWord[i].getCol());
+                break;
+            case 1: // valid guess
+                this.updateTile("valid", this.currentWord[i].getRow(), this.currentWord[i].getCol());
+                break;
+            case 2: // repeat guess
+                this.updateTile("invalid", this.currentWord[i].getRow(), this.currentWord[i].getCol());
+                break;
+        }
+    }
 }
 
 Board.prototype.clearGuess = function() { // call every time mouse is released
-    // points?
-    this.evaluateGuess();
+    // check the guess
+    if (this.evaluateGuess() == 1) {
+        /** give points, play animation! **/
+        
+        // add to history
+        var guess = "";
+        for (var i = 0; i < this.currentWord.length; i++) {
+            guess += this.currentWord[i].getLetter();
+        }
+        this.usedWords[guess] = 0; // value doesn't matter
+    }
     
     // reset all tiles
-    for (var i = 0; i < this.currentWord.length; i++) {
-        this.updateTile("none", this.currentWord[i].getRow(), this.currentWord[i].getCol());
+    for (var row = 0; row < this.board.length; row++) {
+        for (var col = 0; col < this.board[0].length; col++) {
+            this.updateTile("none", row, col);
+        }
     }
 
     //reset word
     this.currentWord = [];
 };
 
-Board.prototype.evaluateGuess = function() {
-    return;
+Board.prototype.evaluateGuess = function() { // 0 for wrong, 1 for valid, 2 for repeat
+    const DICTIONARY = {ER: 0, S: 0}; // ***TEMPORARY***
+    var guess = "";
+    for (var i = 0; i < this.currentWord.length; i++) {
+        guess += this.currentWord[i].getLetter();
+    }
+    if (guess in DICTIONARY) {
+        if (guess in this.usedWords) { // repeat
+            return 2;
+        }
+        return 1; // valid
+    }
+    return 0; // not a valid word
     // we will see
 };
 
