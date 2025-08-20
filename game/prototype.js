@@ -6,6 +6,7 @@ const ctx = canvas.getContext("2d");
 let mouseX = 400, mouseY = 400;
 let mouseIsPressed = false;
 let mouseIsReleased = false;
+let mouseLeft = false;
 
 // grab mouseX, mouseY
 canvas.addEventListener("mousemove",
@@ -22,6 +23,10 @@ canvas.addEventListener("mouseup", function() {
     mouseIsPressed = false;
     mouseIsReleased = true;
 });
+
+// handle mouseLeft
+canvas.addEventListener("mouseleave", () => mouseLeft = true);
+canvas.addEventListener("mouseenter", () => mouseLeft = false);
 
 // load skin
 const tileSkin = {
@@ -48,7 +53,7 @@ let boardShape = [
     [1, 1, 1, 1],
 ];
 const tileSize = canvas.width / boardShape.length; // for our tests 200
-const offset = tileSize / 15; // margin around each tile so theyre not hugging
+const offset = tileSize / 20; // margin around each tile so theyre not hugging
 
 var wordBoard = new Board(boardShape);
 wordBoard.generateLetters();
@@ -61,8 +66,8 @@ function draw() {
         for (var col = 0; col < tileInfo[0].length; col++) {
             const tile = tileInfo[row][col];
             
-            const drawX = offset + tile.getX() * tileSize;
-            const drawY = offset + tile.getY() * tileSize;
+            const drawX = offset + tile.getCol() * tileSize;
+            const drawY = offset + tile.getRow() * tileSize;
             
             const img = tileSkin[tile.getStatus()];
             if (img.complete) { // make sure img loaded
@@ -73,8 +78,38 @@ function draw() {
 }
 
 function loop() {
-    if (mouseIsReleased) {
+    // translate mouseX/mouseY to row col
+    var mouseTileRow = -1;
+    var mouseTileCol = -1; // row, col
+    if (!mouseLeft) { // if mouse is gone dont even bother checking tile
+        if (wordBoard.active) { // circular hitboxes
+            for (var row = 0; row < wordBoard.dim(); row++) {
+                for (var col = 0; col < wordBoard.dim(); col++) {
+                    if (wordBoard.getTile(row, col) !== 0) { // ignore blank tiles
+                        const tileCenterX = col * tileSize + tileSize/2;
+                        const tileCenterY = row * tileSize + tileSize/2;
+                        if (Math.hypot(tileCenterX - mouseX, tileCenterY - mouseY) < tileSize/2) {
+                            mouseTileRow = row;
+                            mouseTileCol = col;
+                        }
+                    }
+                }
+            }
+        }
+        else { // square hitboxes, first letter in chain
+            mouseTileRow = Math.floor(mouseX / tileSize);
+            mouseTileCol = Math.floor(mouseY / tileSize);
+        }
+    }
+
+    if (mouseIsReleased) { // mouse leaves play area or mouse released
         wordBoard.clearGuess();
+    }
+    if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
+        wordBoard.newHover(mouseTileRow, mouseTileCol);
+    }
+    if (mouseTileRow !== -1 && mouseIsPressed) {
+        wordBoard.selectTile(mouseTileRow, mouseTileCol);
     }
     draw();
     requestAnimationFrame(loop);
