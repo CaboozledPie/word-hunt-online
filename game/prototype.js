@@ -32,7 +32,7 @@ const tileSkin = {
     invalid: new Image()
 };
 
-const imgPath = "skins/tile";
+const imgPath = "./game/skins/skindefault/tile";
 tileSkin.none.src = imgPath + ".png";
 tileSkin.hover.src = imgPath + "hover.png";
 tileSkin.click.src = imgPath + "click.png";
@@ -48,6 +48,7 @@ let boardShape = [
     [1, 1, 1, 1],
 ];
 const tileSize = canvas.width / boardShape.length; // for our tests 200
+const offset = tileSize / 15; // margin around each tile so theyre not hugging
 
 var wordBoard = new Board(boardShape);
 wordBoard.generateLetters();
@@ -60,12 +61,12 @@ function draw() {
         for (var col = 0; col < tileInfo[0].length; col++) {
             const tile = tileInfo[row][col];
             
-            const drawX = tile.getX() * tileSize;
-            const drawY = tile.getY() * tileSize;
+            const drawX = offset + tile.getX() * tileSize;
+            const drawY = offset + tile.getY() * tileSize;
             
-            const img = tileImages[tile.getStatus()];
+            const img = tileSkin[tile.getStatus()];
             if (img.complete) { // make sure img loaded
-                ctx.drawImage(img, drawX, drawY, tileSize, tileSize);
+                ctx.drawImage(img, drawX, drawY, tileSize - offset * 2, tileSize - offset * 2);
             }
         }
     }
