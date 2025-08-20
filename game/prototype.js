@@ -53,7 +53,7 @@ let boardShape = [
     [1, 1, 1, 1],
 ];
 const tileSize = canvas.width / boardShape.length; // for our tests 200
-const offset = tileSize / 20; // margin around each tile so theyre not hugging
+const offset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
 
 var wordBoard = new Board(boardShape);
 wordBoard.generateLetters();
@@ -62,6 +62,8 @@ wordBoard.generateLetters();
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var tileInfo = wordBoard.getTiles();
+    
+    // draw tiles
     for (var row = 0; row < tileInfo.length; row++) {
         for (var col = 0; col < tileInfo[0].length; col++) {
             const tile = tileInfo[row][col];
@@ -75,6 +77,30 @@ function draw() {
             }
         }
     }
+
+    // draw red line
+    var currentWord = wordBoard.getCurrentWord();
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(255, 0, 0, 0.5)"; // 50%?
+    ctx.lineWidth = tileSize / 10; // subject to change
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+ 
+    if (currentWord.length > 1) { // minimum two selected for line
+        ctx.moveTo(
+            currentWord[0].getCol() * tileSize + tileSize/2,
+            currentWord[0].getRow() * tileSize + tileSize/2
+        );
+        for (var i = 1; i < currentWord.length; i++) {
+            ctx.lineTo(
+                currentWord[i].getCol() * tileSize + tileSize/2,
+                currentWord[i].getRow() * tileSize + tileSize/2
+            );
+        }
+    }
+
+    ctx.stroke();
+    ctx.closePath();
 }
 
 function loop() {
@@ -102,7 +128,7 @@ function loop() {
         }
     }
 
-    if (mouseIsReleased) { // mouse leaves play area or mouse released
+    if (mouseLeft || mouseIsReleased) { // mouse leaves play area or mouse released
         wordBoard.clearGuess();
     }
     if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also

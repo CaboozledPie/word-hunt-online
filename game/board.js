@@ -102,6 +102,10 @@ Board.prototype.getTiles = function() {
     return this.board;
 };
 
+Board.prototype.getCurrentWord = function() { // necessary for drawing
+    return this.currentWord;
+};
+
 Board.prototype.active = function() { // making a word = active, still hovering = inactive
     return this.currentWord.length !== 0;
 };
