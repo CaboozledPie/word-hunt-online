@@ -35,7 +35,7 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.skin = skin;
     this.currentWord = []; // array of arrays of length 2 [row, col]
     this.currentTile = []; // length 2, row and col
-    this.usedWords = {}; // hashmap for yellow
+    this.usedWords = new Set(); // hashmap for yellow
 };
 
 Board.prototype.generateLetters = function(letters = []) {
@@ -108,7 +108,7 @@ Board.prototype.clearGuess = function() { // call every time mouse is released
         for (var i = 0; i < this.currentWord.length; i++) {
             guess += this.currentWord[i].getLetter();
         }
-        this.usedWords[guess] = 0; // value doesn't matter
+        this.usedWords.add(guess);
     }
     
     // reset all tiles
@@ -123,13 +123,15 @@ Board.prototype.clearGuess = function() { // call every time mouse is released
 };
 
 Board.prototype.evaluateGuess = function() { // 0 for wrong, 1 for valid, 2 for repeat
-    const DICTIONARY = {ER: 0, S: 0}; // ***TEMPORARY***
+    if (this.currentWord.length < 3) { // all words >= 3
+        return 0;
+    }
     var guess = "";
     for (var i = 0; i < this.currentWord.length; i++) {
         guess += this.currentWord[i].getLetter();
     }
-    if (guess in DICTIONARY) {
-        if (guess in this.usedWords) { // repeat
+    if (DICTIONARY.has(guess)) {
+        if (this.usedWords.has(guess)) { // repeat
             return 2;
         }
         return 1; // valid
