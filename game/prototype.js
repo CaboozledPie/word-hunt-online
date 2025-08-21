@@ -95,6 +95,12 @@ function draw() {
     ctx.lineJoin = "round";
  
     if (currentWord.length > 1) { // minimum two selected for line
+        // recolor to clear if valid
+        if(currentWord[0].getStatus() === "valid" || currentWord[0].getStatus() === "invalid") {
+            ctx.strokeStyle = "rgba(255 ,255, 255, 0.8)";
+        }
+        
+        // draw lines
         ctx.moveTo(
             currentWord[0].getCol() * tileSize + tileSize/2,
             currentWord[0].getRow() * tileSize + tileSize/2
