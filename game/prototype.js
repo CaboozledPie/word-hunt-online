@@ -147,6 +147,10 @@ function loop() {
         wordBoard.selectTile(mouseTileRow, mouseTileCol);
     }
     draw();
+
+    /** dom stuffs **/
+    document.getElementById("score").textContent = `Points: ${wordBoard.getScore()}`;
+    
     requestAnimationFrame(loop);
     mouseIsReleased = false; // i have to do this for this logic to work, no getting around it
 }
