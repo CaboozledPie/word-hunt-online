@@ -58,31 +58,34 @@ const offset = tileSize / 20; // margin around each tile so theyre not hugging, 
 var wordBoard = new Board(boardShape);
 wordBoard.generateLetters();
 
+// we can put this in a better place later, just putting it here for now
+var drawTile = function(tile) {
+    const img = tileSkin[tile.getStatus()];
+
+    if (img.complete) { // make sure img loaded
+        const drawSize = (tileSize - offset * 2) * tile.getAnimationSize();
+        const drawX = tile.getCol() * tileSize + tileSize / 2 - drawSize / 2; // topleft orientation coords
+        const drawY = tile.getRow() * tileSize + tileSize / 2 - drawSize / 2;
+        
+        ctx.drawImage(img, drawX, drawY, drawSize, drawSize);
+    }
+
+    // show letter
+    ctx.fillStyle = "black";
+    ctx.font = "bold 60px Verdana";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle"; // center align text
+    ctx.fillText(tile.getLetter(), tile.getCol() * tileSize + tileSize/2, tile.getRow() * tileSize + tileSize/2 + 5);
+    // center align, no animation
+};
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var tileInfo = wordBoard.getTiles();
-    
     // draw tiles
-    for (var row = 0; row < tileInfo.length; row++) {
-        for (var col = 0; col < tileInfo[0].length; col++) {
-            const tile = tileInfo[row][col];
-            
-            const drawX = tile.getCol() * tileSize;
-            const drawY = tile.getRow() * tileSize;
-            
-            // img texture first
-            const img = tileSkin[tile.getStatus()];
-            if (img.complete) { // make sure img loaded
-                ctx.drawImage(img, drawX + offset, drawY + offset, tileSize - offset * 2, tileSize - offset * 2);
-            }
-
-            // show letter
-            ctx.fillStyle = "black";
-            ctx.font = "bold 60px Verdana";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle"; // center align text
-            ctx.fillText(tile.getLetter(), drawX + tileSize/2, drawY + tileSize/2 + 5);
+    for (var row = 0; row < wordBoard.dim(); row++) {
+        for (var col = 0; col < wordBoard.dim(); col++) {
+            const tile = wordBoard.getTile(row, col);
+            drawTile(tile);
         }
     }
 
@@ -97,7 +100,7 @@ function draw() {
     if (currentWord.length > 1) { // minimum two selected for line
         // recolor to clear if valid
         if(currentWord[0].getStatus() === "valid" || currentWord[0].getStatus() === "invalid") {
-            ctx.strokeStyle = "rgba(255 ,255, 255, 0.8)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
         }
         
         // draw lines
@@ -150,12 +153,32 @@ function loop() {
         mouseIsPressed = false; // we should not accidentally drag
     }
     if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
-        wordBoard.newHover(mouseTileRow, mouseTileCol);
+        const hoverStatus = wordBoard.newHover(mouseTileRow, mouseTileCol);
+        if (hoverStatus) {
+            console.log("hover animation start");
+            wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("hover");
+        }
     }
     if (mouseTileRow !== -1 && mouseIsPressed) {
-        wordBoard.selectTile(mouseTileRow, mouseTileCol);
+        const clickStatus = wordBoard.selectTile(mouseTileRow, mouseTileCol);
+        if (clickStatus) {
+            wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("click");
+        }
     }
     draw();
+
+    // update tile animations
+    for (var row = 0; row < wordBoard.dim(); row++) {
+        for (var col = 0; col < wordBoard.dim(); col++) {
+            const tile = wordBoard.getTile(row, col);
+            if (tile.getAnimationType() !== "none") {
+                const animationStatus = tile.progressAnimationFrame();
+                if (animationStatus === 0 && tile.getAnimationType() === "hover") {
+                    tile.endAnimation();
+                }
+            }
+        }
+    }
 
     /** dom stuffs **/
     document.getElementById("score").textContent = `Points: ${wordBoard.getScore()}`;

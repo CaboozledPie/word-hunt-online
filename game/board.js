@@ -1,10 +1,28 @@
 import {LETTER_FREQUENCY} from "./letterfrequency.js";
 
+function bounceScale(t, end = 1, overshoot = 1.1, undershoot = end - (overshoot - end) / 2, frequency = 2) { // helper func
+    // Compute a sine wave oscillation damped by (1-t)
+    const amplitude = overshoot - end;
+    const minAmp = end - undershoot;
+    const damping = 1 - t;
+
+    // Map sine from [-1,1] to [-minAmp, amplitude]
+    const raw = Math.sin(Math.PI * frequency * t) * damping;
+    return end + (raw > 0 ? raw * amplitude : raw * minAmp);
+};
+
 var Tile = function(letter, row, col) {
     this.letter = letter;
     this.row = row; 
     this.col = col;
     this.status = "none"; // hover, click, valid, invalid
+
+    // animation stuff, custom so that we can do small or big
+    this.animationType = "none";
+    this.bounceFrame = 0;
+    this.bounceTime = 30;
+    this.endScale = 1;
+    this.overshoot = 1.1
 };
 
 Tile.prototype.getLetter = function() {
@@ -27,10 +45,58 @@ Tile.prototype.updateStatus = function(status) {
     this.status = status;
 };
 
+Tile.prototype.beginAnimation = function(type) {
+    switch (type) { // set animation params based on type
+        case "hover":
+            this.endScale = 1;
+            this.overshoot = 1.05;
+            this.bounceTime = 10;
+            break;
+        case "click":
+            this.endScale = 1.05;
+            this.overshoot = 1.1;
+            this.bounceTime = 20;
+            break;
+        default:
+            throw new Error("invalid animation type for Tile.beginAnimation");
+            break;
+    }
+    this.animationType = type;
+    this.bounceFrame = 0; // shouldn't be necessary but just to be safe
+};
+
+Tile.prototype.endAnimation = function() {
+    this.animationType = "none";
+    this.bounceFrame = 0;
+};
+
+Tile.prototype.progressAnimationFrame = function() { // returns 1 if progressed, return 0 if done
+    if (this.bounceFrame < this.bounceTime) {
+        this.bounceFrame++;
+        return 1;
+    }
+    return 0;
+    // no resetting frame because i want the animation to stay in its final frame until updated
+};
+
+Tile.prototype.getAnimationSize = function() { // translate animationFrame to usable width/height
+    // returns size multiplier from animation
+    const t = this.bounceFrame / this.bounceTime;
+    return bounceScale(t, this.endScale, this.overshoot);
+};
+
+Tile.prototype.getAnimationType = function() {
+    return this.animationType;
+};
+
+Tile.prototype.getAnimationFrame = function() {
+    return this.bounceFrame;
+};
+
 /**this board class is basically the entire game. everything relevant is in here.**/
 var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfilled, 1 for filled
     if (shape.length !== shape[0].length) {
-        throw new Error("board shape must be inputted as square");
+        throw new Error("board shape must be inputted as square for Board() constructor");
     }
     this.board = shape;
     this.skin = skin;
@@ -67,19 +133,23 @@ Board.prototype.updateTile = function(status, row, col) {
     }
 };
 
-Board.prototype.newHover = function(row, col) {
+Board.prototype.newHover = function(row, col) { // returns 1 if new hover, 0 if failed
+    if (this.getTile(row, col).getStatus() !== "none") { // if the new tile is already hovered/clicked, can't update
+        return 0;
+    }
     if (this.currentTile.length == 2) { // if no currentTile then we'll have index error
         this.updateTile("none", this.currentTile[0], this.currentTile[1]);
     }
     this.currentTile = [row, col];
     this.updateTile("hover", row, col);
+    return 1;
 };
 
-Board.prototype.selectTile = function(row, col) {
+Board.prototype.selectTile = function(row, col) { // returns 1 if new tile selected, 0 if failed
     // make sure you don't double select
     for (var i = 0; i < this.currentWord.length; i++) {
         if (this.currentWord[i].getRow() === row && this.currentWord[i].getCol() === col) {
-            return; // can't select
+            return 0; // can't select
         }
     }
     this.currentWord.push(this.getTile(row, col));
@@ -98,6 +168,7 @@ Board.prototype.selectTile = function(row, col) {
                 break;
         }
     }
+    return 1;
 }
 
 Board.prototype.clearGuess = function() { // call every time mouse is released
@@ -157,6 +228,9 @@ Board.prototype.evaluateGuess = function() { // 0 for wrong, 1 for valid, 2 for 
 };
 
 Board.prototype.getTile = function(row, col) {
+    if (this.board[row][col] === 0) {
+        throw new Error(`tried to Board.getTile(), found none at ${row}, ${col}`);
+    }
     return this.board[row][col];
 };
 
