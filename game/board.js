@@ -27,6 +27,7 @@ Tile.prototype.updateStatus = function(status) {
     this.status = status;
 };
 
+/**this board class is basically the entire game. everything relevant is in here.**/
 var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfilled, 1 for filled
     if (shape.length !== shape[0].length) {
         throw new Error("board shape must be inputted as square");
@@ -36,6 +37,7 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.currentWord = []; // array of arrays of length 2 [row, col]
     this.currentTile = []; // length 2, row and col
     this.usedWords = new Set(); // hashmap for yellow
+    this.score = 0;
 };
 
 Board.prototype.generateLetters = function(letters = []) {
@@ -101,8 +103,22 @@ Board.prototype.selectTile = function(row, col) {
 Board.prototype.clearGuess = function() { // call every time mouse is released
     // check the guess
     if (this.evaluateGuess() == 1) {
-        /** give points, play animation! **/
-        
+        // give points
+        switch (this.currentWord.length) {
+            case 3:
+                this.score += 100;
+                break;
+            case 4:
+                this.score += 400;
+                break;
+            case 5:
+                this.score += 800;
+                break;
+            default:
+                this.score += 400 * this.currentWord.length - 1000
+                break;
+        }
+
         // add to history
         var guess = "";
         for (var i = 0; i < this.currentWord.length; i++) {
@@ -158,6 +174,10 @@ Board.prototype.active = function() { // making a word = active, still hovering 
 
 Board.prototype.dim = function() {
     return this.board.length;
+};
+
+Board.prototype.getScore = function() {
+    return this.score;
 };
 
 export {Tile, Board};
