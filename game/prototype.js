@@ -3,7 +3,7 @@ import {Tile, Board} from "./board.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let mouseX = 400, mouseY = 400;
+let mouseX = canvas.width/2, mouseY = canvas.height/2;
 let mouseIsPressed = false;
 let mouseIsReleased = false;
 let mouseLeft = false;
@@ -122,9 +122,12 @@ function loop() {
     var mouseTileRow = -1;
     var mouseTileCol = -1; // row, col
     if (!mouseLeft) { // if mouse is gone dont even bother checking tile
-        if (wordBoard.active) { // circular hitboxes
-            for (var row = 0; row < wordBoard.dim(); row++) {
-                for (var col = 0; col < wordBoard.dim(); col++) {
+        if (wordBoard.active()) { // circular hitboxes
+            const prevTile = wordBoard.getCurrentWord()[wordBoard.getCurrentWord().length-1];
+            const prevRow = prevTile.getRow();
+            const prevCol = prevTile.getCol();
+            for (var row = Math.max(0, prevRow-1); row < Math.min(wordBoard.dim(), prevRow+2); row++) {
+                for (var col = Math.max(0, prevCol-1); col < Math.max(wordBoard.dim(), prevCol+2); col++) {
                     if (wordBoard.getTile(row, col) !== 0) { // ignore blank tiles
                         const tileCenterX = col * tileSize + tileSize/2;
                         const tileCenterY = row * tileSize + tileSize/2;
@@ -137,8 +140,8 @@ function loop() {
             }
         }
         else { // square hitboxes, first letter in chain
-            mouseTileRow = Math.floor(mouseX / tileSize);
-            mouseTileCol = Math.floor(mouseY / tileSize);
+            mouseTileRow = Math.floor(mouseY / tileSize);
+            mouseTileCol = Math.floor(mouseX / tileSize);
         }
     }
 

@@ -169,7 +169,7 @@ Board.prototype.getCurrentWord = function() { // necessary for drawing
 };
 
 Board.prototype.active = function() { // making a word = active, still hovering = inactive
-    return this.currentWord.length !== 0;
+    return this.currentWord.length > 0;
 };
 
 Board.prototype.dim = function() {
