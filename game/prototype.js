@@ -1,4 +1,5 @@
 import {Tile, Board} from "./board.js";
+import {DICTIONARY_READY} from "./dictionarytools.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -45,18 +46,6 @@ tileSkin.valid.src = imgPath + "valid.png";
 tileSkin.invalid.src = imgPath + "invalid.png";
 
 /** ACTUALLY RUNNING THE GAME **/
-// even this behavior should probably be sectioned off later but for now it's going in here
-let boardShape = [
-    [1, 1, 1, 1],
-    [1, 1, 1, 1],
-    [1, 1, 1, 1],
-    [1, 1, 1, 1],
-];
-const tileSize = canvas.width / boardShape.length; // for our tests 200
-const offset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
-
-var wordBoard = new Board(boardShape);
-wordBoard.generateLetters();
 
 // we can put this in a better place later, just putting it here for now
 var drawTile = function(tile) {
@@ -79,7 +68,7 @@ var drawTile = function(tile) {
     // center align, no animation
 };
 
-function draw() {
+function draw(wordBoard) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // draw tiles
     for (var row = 0; row < wordBoard.dim(); row++) {
@@ -120,7 +109,7 @@ function draw() {
     ctx.closePath();
 }
 
-function loop() {
+function loop(wordBoard) {
     // translate mouseX/mouseY to row col
     var mouseTileRow = -1;
     var mouseTileCol = -1; // row, col
@@ -155,7 +144,6 @@ function loop() {
     if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
         const hoverStatus = wordBoard.newHover(mouseTileRow, mouseTileCol);
         if (hoverStatus) {
-            console.log("hover animation start");
             wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("hover");
         }
     }
@@ -165,7 +153,7 @@ function loop() {
             wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("click");
         }
     }
-    draw();
+    draw(wordBoard);
 
     // update tile animations
     for (var row = 0; row < wordBoard.dim(); row++) {
@@ -181,10 +169,26 @@ function loop() {
     }
 
     /** dom stuffs **/
-    document.getElementById("score").textContent = `Points: ${wordBoard.getScore()}`;
+    document.getElementById("score").textContent = `Points: ${wordBoard.getScore()} Words: ${wordBoard.getWordCount()}`;
     
-    requestAnimationFrame(loop);
+    requestAnimationFrame(() => loop(wordBoard));
     mouseIsReleased = false; // i have to do this for this logic to work, no getting around it
 }
 
-loop();
+let boardShape = [
+    [1, 1, 1, 1],
+    [1, 1, 1, 1],
+    [1, 1, 1, 1],
+    [1, 1, 1, 1],
+];
+const tileSize = canvas.width / boardShape.length; // for our tests 200
+const offset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
+
+// wait until dictionary is loaded before starting le game
+DICTIONARY_READY.then(() => {
+    // even this behavior should probably be sectioned off later but for now it's going in here
+    var gameBoard = new Board(boardShape);
+    gameBoard.generateLetters();
+    gameBoard.solve();
+    loop(gameBoard);
+});

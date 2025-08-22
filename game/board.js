@@ -1,4 +1,5 @@
 import {LETTER_FREQUENCY} from "./letterfrequency.js";
+import {DICTIONARY} from "./dictionarytools.js";
 
 function bounceScale(t, end = 1, overshoot = 1.1, undershoot = end - (overshoot - end) / 2, frequency = 2) { // helper func
     // Compute a sine wave oscillation damped by (1-t)
@@ -104,8 +105,10 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.currentTile = []; // length 2, row and col
     this.usedWords = new Set(); // hashmap for yellow
     this.score = 0;
+    this.key = []; // sorted list of answers
 };
 
+// make the board according to letter distribution (bag w/o replacement)
 Board.prototype.generateLetters = function(letters = []) {
     // make a copy of the frequency so you have a bag w/o replacement
     var bag = LETTER_FREQUENCY;
@@ -125,6 +128,45 @@ Board.prototype.generateLetters = function(letters = []) {
         }
     }
 };
+
+// board solver algorithm
+Board.prototype.solve = function() { // assume board is already generated, if not gg
+    const visited = Array.from({length: this.dim()}, () => Array(this.dim()).fill(false));
+    
+    const directions = [
+        [0, 1], [1, 0], [0, -1], [-1, 0],
+        [1, 1], [1, -1], [-1, 1], [-1, -1]
+    ];
+    
+    // recursive depth first search
+    const depthFirstSearch = (row, col, prefix) => {
+        if (row < 0 || row >= this.dim() || col < 0 || col >= this.dim()) return;
+        if (visited[row][col]) return;
+
+        prefix += this.getTile(row, col).getLetter();
+        if (!DICTIONARY.startsWith(prefix)) return;
+        if (DICTIONARY.has(prefix)) this.key.push(prefix);
+        
+        visited[row][col] = true;
+        for (let [dr, dc] of directions) {
+            depthFirstSearch(row + dr, col + dc, prefix);
+        }
+        visited[row][col] = false;
+    }
+
+    for (var row = 0; row < this.dim(); row++) {
+        for (var col = 0; col < this.dim(); col++) {
+            depthFirstSearch(row, col, "");
+        }
+    }
+
+    // sort the found words by greatest to shortest, then alphabetically
+    this.key.sort(function(a, b) {
+        if (b.length !== a.length) return b.length - a.length;
+        return a.localeCompare(b);
+    });
+    console.log(this.key);
+}
 
 Board.prototype.updateTile = function(status, row, col) {
     // needs to know which tile is being interacted with at call time
@@ -252,6 +294,10 @@ Board.prototype.dim = function() {
 
 Board.prototype.getScore = function() {
     return this.score;
+};
+
+Board.prototype.getWordCount = function() {
+    return this.usedWords.size;
 };
 
 export {Tile, Board};
