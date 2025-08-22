@@ -26,7 +26,7 @@ canvas.addEventListener("mouseup", function() {
 });
 
 // handle mouseLeft
-canvas.addEventListener("mouseleave", () => mouseLeft = true);
+canvas.addEventListener("mouseout", () => mouseLeft = true);
 canvas.addEventListener("mouseenter", () => mouseLeft = false);
 
 // load skin
@@ -138,7 +138,9 @@ function loop(wordBoard) {
     }
 
     if (mouseLeft || mouseIsReleased) { // mouse leaves play area or mouse released
+        console.log("hi");
         wordBoard.clearGuess();
+        wordBoard.clearAnimations();
         mouseIsPressed = false; // we should not accidentally drag
     }
     if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
