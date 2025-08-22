@@ -138,7 +138,6 @@ function loop(wordBoard) {
     }
 
     if (mouseLeft || mouseIsReleased) { // mouse leaves play area or mouse released
-        console.log("hi");
         wordBoard.clearGuess();
         wordBoard.clearAnimations();
         mouseIsPressed = false; // we should not accidentally drag
