@@ -18,12 +18,10 @@ var Tile = function(letter, row, col) {
     this.col = col;
     this.status = "none"; // hover, click, valid, invalid
 
-    // animation stuff, custom so that we can do small or big
+    // animation stuff, control animation type and time
     this.animationType = "none";
     this.bounceFrame = 0;
     this.bounceTime = 30;
-    this.endScale = 1;
-    this.overshoot = 1.1
 };
 
 Tile.prototype.getLetter = function() {
@@ -49,17 +47,13 @@ Tile.prototype.updateStatus = function(status) {
 Tile.prototype.beginAnimation = function(type) {
     switch (type) { // set animation params based on type
         case "hover":
-            this.endScale = 1;
-            this.overshoot = 1.05;
             this.bounceTime = 10;
             break;
         case "click":
-            this.endScale = 1.05;
-            this.overshoot = 1.1;
             this.bounceTime = 20;
             break;
         default:
-            throw new Error("invalid animation type for Tile.beginAnimation");
+            throw new Error("invalid animation type for Tile.beginAnimation()");
             break;
     }
     this.animationType = type;
@@ -82,16 +76,30 @@ Tile.prototype.progressAnimationFrame = function() { // returns 1 if progressed,
 
 Tile.prototype.getAnimationSize = function() { // translate animationFrame to usable width/height
     // returns size multiplier from animation
+    var endScale, overshoot;
+    switch (this.animationType) { // set animation params based on type
+        case "none":
+            endScale = 1;
+            overshoot = 1;
+            break;
+        case "hover":
+            endScale = 1;
+            overshoot = 1.05;
+            break;
+        case "click":
+            endScale = 1.05;
+            overshoot = 1.1;
+            break;
+        default:
+            throw new Error("invalid animation type for Tile.getAnimationSize()");
+            break;
+    }
     const t = this.bounceFrame / this.bounceTime;
-    return bounceScale(t, this.endScale, this.overshoot);
+    return bounceScale(t, endScale, overshoot);
 };
 
 Tile.prototype.getAnimationType = function() {
     return this.animationType;
-};
-
-Tile.prototype.getAnimationFrame = function() {
-    return this.bounceFrame;
 };
 
 /**this board class is basically the entire game. everything relevant is in here.**/
@@ -269,6 +277,14 @@ Board.prototype.evaluateGuess = function() { // 0 for wrong, 1 for valid, 2 for 
     }
     return 0; // not a valid word
     // we will see
+};
+
+Board.prototype.clearAnimations = function() {
+    for (var row = 0; row < this.dim(); row++) {
+        for (var col = 0; col < this.dim(); col++) {
+            this.getTile(row, col).endAnimation();
+        }
+    }
 };
 
 Board.prototype.getTile = function(row, col) {
