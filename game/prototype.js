@@ -31,6 +31,7 @@ canvas.addEventListener("mouseenter", () => mouseLeft = false);
 
 // load skin
 const tileSkin = {
+    board: new Image(),
     none: new Image(),
     hover: new Image(),
     click: new Image(),
@@ -38,12 +39,13 @@ const tileSkin = {
     invalid: new Image()
 };
 
-const imgPath = "./game/skins/skindefault/tile";
-tileSkin.none.src = imgPath + ".png";
-tileSkin.hover.src = imgPath + "hover.png";
-tileSkin.click.src = imgPath + "click.png";
-tileSkin.valid.src = imgPath + "valid.png";
-tileSkin.invalid.src = imgPath + "invalid.png";
+const imgPath = "./game/skins/skindefault/";
+tileSkin.board.src = "./game/skins/skindefault/board.png";
+tileSkin.none.src = imgPath + "tile.png";
+tileSkin.hover.src = imgPath + "tilehover.png";
+tileSkin.click.src = imgPath + "tileclick.png";
+tileSkin.valid.src = imgPath + "tilevalid.png";
+tileSkin.invalid.src = imgPath + "tileinvalid.png";
 
 /** ACTUALLY RUNNING THE GAME **/
 
@@ -52,9 +54,11 @@ var drawTile = function(tile) {
     const img = tileSkin[tile.getStatus()];
 
     if (img.complete) { // make sure img loaded
-        const drawSize = (tileSize - offset * 2) * tile.getAnimationSize();
-        const drawX = tile.getCol() * tileSize + tileSize / 2 - drawSize / 2; // topleft orientation coords
-        const drawY = tile.getRow() * tileSize + tileSize / 2 - drawSize / 2;
+        const drawSize = (tileSize - tileOffset * 2) * tile.getAnimationSize();
+        
+        // topleft orientation coords
+        const drawX = boardOffset + tile.getCol() * tileSize + tileSize / 2 - drawSize / 2;
+        const drawY = boardOffset + tile.getRow() * tileSize + tileSize / 2 - drawSize / 2;
         
         ctx.drawImage(img, drawX, drawY, drawSize, drawSize);
     }
@@ -64,12 +68,19 @@ var drawTile = function(tile) {
     ctx.font = "bold 60px Verdana";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle"; // center align text
-    ctx.fillText(tile.getLetter(), tile.getCol() * tileSize + tileSize/2, tile.getRow() * tileSize + tileSize/2 + 5);
+    ctx.fillText(tile.getLetter(), boardOffset + tile.getCol() * tileSize + tileSize/2, boardOffset + tile.getRow() * tileSize + tileSize/2 + 5);
     // center align, no animation
 };
 
 function draw(wordBoard) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw board
+    const boardImg = tileSkin["board"];
+    if (boardImg.complete) {
+        ctx.drawImage(boardImg, 0, 0, canvas.width, canvas.height);
+    }
+
     // draw tiles
     for (var row = 0; row < wordBoard.dim(); row++) {
         for (var col = 0; col < wordBoard.dim(); col++) {
@@ -94,13 +105,13 @@ function draw(wordBoard) {
         
         // draw lines
         ctx.moveTo(
-            currentWord[0].getCol() * tileSize + tileSize/2,
-            currentWord[0].getRow() * tileSize + tileSize/2
+            boardOffset + currentWord[0].getCol() * tileSize + tileSize/2,
+            boardOffset + currentWord[0].getRow() * tileSize + tileSize/2
         );
         for (var i = 1; i < currentWord.length; i++) {
             ctx.lineTo(
-                currentWord[i].getCol() * tileSize + tileSize/2,
-                currentWord[i].getRow() * tileSize + tileSize/2
+                boardOffset + currentWord[i].getCol() * tileSize + tileSize/2,
+                boardOffset + currentWord[i].getRow() * tileSize + tileSize/2
             );
         }
     }
@@ -121,8 +132,8 @@ function loop(wordBoard) {
             for (var row = Math.max(0, prevRow-1); row < Math.min(wordBoard.dim(), prevRow+2); row++) {
                 for (var col = Math.max(0, prevCol-1); col < Math.max(wordBoard.dim(), prevCol+2); col++) {
                     if (wordBoard.getTile(row, col) !== 0) { // ignore blank tiles
-                        const tileCenterX = col * tileSize + tileSize/2;
-                        const tileCenterY = row * tileSize + tileSize/2;
+                        const tileCenterX = boardOffset + col * tileSize + tileSize/2;
+                        const tileCenterY = boardOffset + row * tileSize + tileSize/2;
                         if (Math.hypot(tileCenterX - mouseX, tileCenterY - mouseY) < tileSize/2) {
                             mouseTileRow = row;
                             mouseTileCol = col;
@@ -132,8 +143,12 @@ function loop(wordBoard) {
             }
         }
         else { // square hitboxes, first letter in chain
-            mouseTileRow = Math.floor(mouseY / tileSize);
-            mouseTileCol = Math.floor(mouseX / tileSize);
+            mouseTileRow = Math.floor((mouseY - boardOffset) / tileSize);
+            mouseTileCol = Math.floor((mouseX - boardOffset) / tileSize);
+            if (mouseTileRow > wordBoard.dim() - 1 || mouseTileCol > wordBoard.dim() - 1) {
+                mouseTileRow = -1;
+                mouseTileCol  = -1;
+            }
         }
     }
 
@@ -182,8 +197,9 @@ let boardShape = [
     [1, 1, 1, 1],
     [1, 1, 1, 1],
 ];
-const tileSize = canvas.width / boardShape.length; // for our tests 200
-const offset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
+const boardOffset = canvas.width / 20;
+const tileSize = (canvas.width - boardOffset * 2) / boardShape.length; // for our tests 200
+const tileOffset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
 
 // wait until dictionary is loaded before starting le game
 DICTIONARY_READY.then(() => {
