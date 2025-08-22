@@ -132,7 +132,8 @@ Board.prototype.generateLetters = function(letters = []) {
 // board solver algorithm
 Board.prototype.solve = function() { // assume board is already generated, if not gg
     const visited = Array.from({length: this.dim()}, () => Array(this.dim()).fill(false));
-    
+    const unsorted = new Set();
+
     const directions = [
         [0, 1], [1, 0], [0, -1], [-1, 0],
         [1, 1], [1, -1], [-1, 1], [-1, -1]
@@ -145,7 +146,7 @@ Board.prototype.solve = function() { // assume board is already generated, if no
 
         prefix += this.getTile(row, col).getLetter();
         if (!DICTIONARY.startsWith(prefix)) return;
-        if (DICTIONARY.has(prefix)) this.key.push(prefix);
+        if (DICTIONARY.has(prefix) && !unsorted.has(prefix) && prefix.length >= 3) unsorted.add(prefix);
         
         visited[row][col] = true;
         for (let [dr, dc] of directions) {
@@ -161,6 +162,7 @@ Board.prototype.solve = function() { // assume board is already generated, if no
     }
 
     // sort the found words by greatest to shortest, then alphabetically
+    this.key = Array.from(unsorted);
     this.key.sort(function(a, b) {
         if (b.length !== a.length) return b.length - a.length;
         return a.localeCompare(b);
