@@ -145,7 +145,8 @@ function loop(wordBoard) {
         else { // square hitboxes, first letter in chain
             mouseTileRow = Math.floor((mouseY - boardOffset) / tileSize);
             mouseTileCol = Math.floor((mouseX - boardOffset) / tileSize);
-            if (mouseTileRow > wordBoard.dim() - 1 || mouseTileCol > wordBoard.dim() - 1) {
+            if (mouseTileRow > wordBoard.dim() - 1 || mouseTileCol > wordBoard.dim() - 1
+                || mouseTileRow < 0 || mouseTileCol < 0) {
                 mouseTileRow = -1;
                 mouseTileCol  = -1;
             }
