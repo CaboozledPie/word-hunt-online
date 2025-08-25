@@ -1,0 +1,29 @@
+﻿	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Wordhunt.io</title>
+	<link rel="stylesheet" href="titlescreen.css">
+	<h1> Wordhunt.io</h1>
+	</head>
+	<body>
+
+	  <div class="container">
+	<div onclick="handleMenuClick('Quick Play')">Quick Play</div>
+    <div onclick="handleMenuClick('Multiplayer')">Multiplayer</div>
+    <div onclick="handleMenuClick('Rankings')">Rankings</div>
+    <div onclick="handleMenuClick('Settings')">Settings</div>
+	</div> 
+	<script>
+function handleMenuClick(option) {
+ function navigateToPage(page) {
+    event.target.style.transform = 'scale(0.90)';
+    setTimeout(() => {
+        event.target.style.transform = '';
+        window.location.href = page;
+    }, 100);
+}
+</script>
+	</body>
+	</html>
