@@ -7,9 +7,7 @@ const ctx = canvas.getContext("2d");
 let mouseX = canvas.width/2, mouseY = canvas.height/2;
 let mouseIsPressed = false;
 let mouseIsReleased = false;
-let mouseLeft = false;
-
-// grab mouseX, mouseY
+let mouseLeft = false;// grab mouseX, mouseY
 canvas.addEventListener("mousemove",
     e => {
         const rect = canvas.getBoundingClientRect();
