@@ -3,7 +3,7 @@ from .serializers import PostSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
-from .models import Post, FrontendSession
+from .models import Post
 from datetime import datetime, timedelta
 
 # Create your views here.
