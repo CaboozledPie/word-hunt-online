@@ -3,9 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import permissions, status
-from .models import FrontendSession
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+
+from .models import FrontendSession
+from .matchmaking import unranked_add_to_queue, unranked_remove_from_queue
 
 # Create your views here.
 
@@ -37,4 +39,6 @@ def enter_matchmaking(request):
         return Response({"error": "Token expired"}, status=status.HTTP_401_UNAUTHORIZED)
 
     # actually enter matchmaking
+    unranked_add_to_queue(token_str, None)
+
     return Response({"status": "Entered matchmaking successfully!"})
