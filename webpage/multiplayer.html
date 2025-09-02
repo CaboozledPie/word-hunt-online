@@ -8,16 +8,15 @@
     <link rel="stylesheet" href="multiplayer.css">
 </head>
 <body>
-
     <a href="titlescreen.html" class="back-button">← Back</a>
     
     <div class="main-header">
         Multiplayer
     </div>
-       <div class="game-container">
-       <script src="/game/prototype.js" type="module"></script>
+    <div class="game-container">
+        <script src="/game/prototype.js" type="module"></script>
     </div>
-    <div id="score">Points: 0 Words: 0</div>
+    <div id="score" style="display: none;">Points: 0 Words: 0</div>
     <div id="status"></div>
     
     <div class="multiplayer-container">
@@ -63,17 +62,60 @@
             { name: "Player 4", score: 0, words: 0 }
         ];
         
-        // Mock score updates
-        function simulateScoreUpdates() {
+        // Function to parse score from the game's score element
+        function parseGameScore() {
+            const scoreElement = document.getElementById('score');
+            const scoreText = scoreElement.textContent;
+            
+            // Parse "Points: X Words: Y" format
+            const pointsMatch = scoreText.match(/Points:\s*(\d+)/);
+            const wordsMatch = scoreText.match(/Words:\s*(\d+)/);
+            
+            const points = pointsMatch ? parseInt(pointsMatch[1]) : 0;
+            const words = wordsMatch ? parseInt(wordsMatch[1]) : 0;
+            
+            return { points, words };
+        }
+        
+        // Function to update your score from the game
+        function updateYourScore() {
+            const gameScore = parseGameScore();
+            
+            // Only update if the score has changed
+            if (players[0].score !== gameScore.points || players[0].words !== gameScore.words) {
+                players[0].score = gameScore.points;
+                players[0].words = gameScore.words;
+                
+                document.getElementById('yourScore').textContent = `Points: ${players[0].score}`;
+                document.getElementById('yourWords').textContent = `Words: ${players[0].words}`;
+            }
+        }
+        
+        // Watch for changes to the game score
+        function watchGameScore() {
+            const scoreElement = document.getElementById('score');
+            let lastScoreText = scoreElement.textContent;
+            
+            setInterval(() => {
+                if (scoreElement.textContent !== lastScoreText) {
+                    lastScoreText = scoreElement.textContent;
+                    updateYourScore();
+                }
+            }, 100); // Check every 100ms for score updates
+        }
+        
+        // Mock opponent score updates
+        function simulateOpponentUpdates() {
             setInterval(() => {
                 // Random opponent score updates
-                const randomPlayer = Math.floor(Math.random() * 4);
-                if (randomPlayer > 0 && Math.random() > 0.7) {
-                    players[randomPlayer].score += Math.floor(Math.random() * 10) + 1;
-                    players[randomPlayer].words += 1;
-                    updatePlayerDisplay(randomPlayer);
+                for (let i = 1; i < players.length; i++) {
+                    if (Math.random() > 0.85) { // 15% chance per interval
+                        players[i].score += Math.floor(Math.random() * 8) + 1;
+                        players[i].words += 1;
+                        updatePlayerDisplay(i);
+                    }
                 }
-            }, 3000);
+            }, 2000);
         }
         
         function updatePlayerDisplay(playerIndex) {
@@ -85,40 +127,45 @@
                 if (playerCard && playerCard.style.display !== 'none') {
                     const scoreElement = playerCard.querySelector('.player-score');
                     const wordsElement = playerCard.querySelector('.player-words');
-                    scoreElement.textContent = `Points: ${players[playerIndex].score}`;
-                    wordsElement.textContent = `Words: ${players[playerIndex].words}`;
+                    if (scoreElement && wordsElement) {
+                        scoreElement.textContent = `Points: ${players[playerIndex].score}`;
+                        wordsElement.textContent = `Words: ${players[playerIndex].words}`;
+                    }
                 }
             }
         }
         
-        // Connection status simulation
-        function simulateConnection() {
-            const statusElement = document.getElementById('connectionStatus');
-            let connected = true;
+        // Initialize multiplayer display
+        function initializeMultiplayer() {
+            // Set room size (you can modify this or make it dynamic)
+            const roomSize = 2; // Change this to show more players
             
-            setInterval(() => {
-                if (Math.random() > 0.95) { // 5% chance of connection issue
-                    connected = !connected;
-                    statusElement.textContent = connected ? 'Connected' : 'Reconnecting...';
-                    statusElement.className = connected ? 'connection-status' : 'connection-status disconnected';
+            // Show/hide players based on room size
+            for (let i = 2; i < 4; i++) {
+                const playerCard = document.getElementById(`opponent${i}`);
+                if (i < roomSize) {
+                    playerCard.style.display = 'block';
+                } else {
+                    playerCard.style.display = 'none';
                 }
-            }, 2000);
-        }
-        
-        // Initialize
-        simulateScoreUpdates();
-        simulateConnection();
-        
-        // Show/hide players based on room size (you can modify this)
-        const roomSize = 2; // Change this to show more players
-        for (let i = 2; i < 4; i++) {
-            if (i < roomSize) {
-                document.getElementById(`opponent${i}`).style.display = 'block';
             }
+            
+            // Start watching for score updates from the game
+            watchGameScore();
+            
+            // Start simulating opponent updates
+            simulateOpponentUpdates();
         }
         
-        // You can load the actual game here
-        // <script type="module" src="../game/prototype.js"></script>
+        // Wait for the DOM to be fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', initializeMultiplayer);
+        
+        // Also initialize when the script loads (in case DOM is already ready)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMultiplayer);
+        } else {
+            initializeMultiplayer();
+        }
     </script>
 </body>
 </html>

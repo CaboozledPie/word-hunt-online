@@ -1,41 +1,41 @@
-﻿	<!DOCTYPE html>
-	<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Wordhunt.io</title>
-	<link rel="stylesheet" href="titlescreen.css">
-	<h1> Wordhunt.io</h1>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordHunt.io - Main Menu</title>
+   <link rel="stylesheet" href="titlescreen.css">
 </head>
 <body>
     <div class="container">
-        <div class="button-wrapper">
-            <div onclick="navigateToPage(event, 'quickplay.html')">Quick Play</div>
-            <div class="button-description">play</div>
-        </div>
-        <div class="button-wrapper">
-            <div onclick="navigateToPage(event, 'multiplayer.html')">Multiplayer</div>
-            <div class="button-description">yo</div>
-        </div>
-        <div class="button-wrapper">
-            <div onclick="navigateToPage(event, 'rankings.html')">Rankings</div>
-            <div class="button-description">word</div>
-        </div>
-        <div class="button-wrapper">
-            <div onclick="navigateToPage(event, 'settings.html')">Settings</div>
-            <div class="button-description">hunt</div>
+        <h1 class="title">Wordhunt</h1>
+        
+        <div class="menu-grid">
+            <a href="quickplay.html" class="menu-button">
+                Quickplay
+            </a>
+            
+            <a href="multiplayer.html" class="menu-button">
+                Multiplayer
+            </a>
+            
+            <a href="leaderboards.html" class="menu-button">
+                Leaderboards
+            </a>
+            
+            <a href="settings.html" class="menu-button">
+                Settings
+            </a>
         </div>
     </div>
-
-    <script>
-        function navigateToPage(event, page) {
-            const target = event.target;
-            target.style.transform = 'scale(0.95) translateY(-20px)';
-            setTimeout(() => {
-                target.style.transform = '';
-                window.location.href = page;
-            }, 100);
-        }
-    </script>
 </body>
-</html>
+<script type="module">
+  import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+  animate('.menu-button', {
+  left: 'calc(7.75rem * 2)',
+  borderRadius: 64,
+  'background-color': '#F9F640',
+  filter: 'blur(20px)',
+});
+</script>
+</html> 
