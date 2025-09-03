@@ -4,10 +4,145 @@
     <link rel="stylesheet" href="quickplay.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rankings- Wordhunt.io</title>
+    <title>Rankings - Wordhunt.io</title>
+    <style>
+        #container {
+            width: 600px;
+            height: auto;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .row {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            height: 40px;
+            border-bottom: 1px solid #AFAFAF;
+            font-size: 18px;
+        }
+
+        .name {
+            width: 50%;
+        }
+
+        .score, .words {
+            width: 25%;
+            text-align: right;
+        }
+
+        .row:nth-child(1) {
+            background: gold;
+            font-weight: bold;
+        }
+
+        .row:nth-child(2) {
+            background: #c0c0c0;
+            font-weight: bold;
+        }
+
+        .row:nth-child(3) {
+            background: #cd7f32;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+         #player-form {
+            width: 600px;
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        #player-form input {
+            padding: 8px;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        #player-form button {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <a href="titlescreen.html" class="back-button">← Back to Menu</a>
-    
+    <a href="index.html" class="back-button">← Back to Menu</a>
     <h1>Rankings</h1>
- </body>
+
+    <form id="player-form">
+        <input type="text" id="name" placeholder="Player Name" required>
+        <input type="number" id="points" placeholder="Points" required>
+        <input type="number" id="words" placeholder="Words" required>
+        <button type="submit">Add Player</button>
+    </form>
+
+    <div id="container"></div>
+
+    <script>
+        // Static leaderboard (default players)
+        const staticPlayers = [
+            { name: "Player1", points: 430, words: 15 },
+            { name: "Player2", points: 580, words: 22 },
+            { name: "Player3", points: 310, words: 10 },
+            { name: "Player4", points: 640, words: 30 },
+            { name: "Player5", points: 495, words: 18 }
+        ];
+
+        // Dynamic players (starts empty, but can be added)
+        let dynamicPlayers = [];
+
+        const container = document.querySelector('#container');
+        const form = document.querySelector('#player-form');
+
+        // Function to render leaderboard (combines static + dynamic)
+        function renderLeaderboard() {
+            container.innerHTML = '';
+            // Merge static and dynamic players
+            const allPlayers = [...staticPlayers, ...dynamicPlayers];
+            // Sort by points (descending)
+            allPlayers.sort((a, b) => b.points - a.points);
+
+            allPlayers.forEach(player => {
+                let row = document.createElement('div');
+                row.classList.add('row');
+                row.innerHTML = `
+                    <div class="name">${player.name}</div>
+                    <div class="score">${player.points}</div>
+                    <div class="words">${player.words} words</div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Add new player dynamically
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.querySelector('#name').value.trim();
+            const points = parseInt(document.querySelector('#points').value);
+            const words = parseInt(document.querySelector('#words').value);
+
+            if (name && !isNaN(points) && !isNaN(words)) {
+                dynamicPlayers.push({ name, points, words });
+                renderLeaderboard();
+                form.reset();
+            }
+        });
+
+        // Initial render
+        renderLeaderboard();
+    </script>
+</body>
+</html>
