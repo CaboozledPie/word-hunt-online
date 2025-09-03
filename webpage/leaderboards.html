@@ -92,7 +92,7 @@
     <div id="container"></div>
 
     <script>
-        // Static leaderboard (default players)
+        // Static leaderboard
         const staticPlayers = [
             { name: "Player1", points: 430, words: 15 },
             { name: "Player2", points: 580, words: 22 },
@@ -101,18 +101,16 @@
             { name: "Player5", points: 495, words: 18 }
         ];
 
-        // Dynamic players (starts empty, but can be added)
+        // Test functionality: adding players
         let dynamicPlayers = [];
 
         const container = document.querySelector('#container');
         const form = document.querySelector('#player-form');
 
-        // Function to render leaderboard (combines static + dynamic)
+        // Loading leaderboard
         function renderLeaderboard() {
             container.innerHTML = '';
-            // Merge static and dynamic players
             const allPlayers = [...staticPlayers, ...dynamicPlayers];
-            // Sort by points (descending)
             allPlayers.sort((a, b) => b.points - a.points);
 
             allPlayers.forEach(player => {
@@ -127,7 +125,7 @@
             });
         }
 
-        // Add new player dynamically
+        // Adding new player via website
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.querySelector('#name').value.trim();

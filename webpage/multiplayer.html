@@ -54,7 +54,7 @@
     </div>
     
     <script>
-        // Mock multiplayer functionality for demonstration
+ // TODO: Rewrite the chatgpt bullshit to smth
         let players = [
             { name: "You", score: 0, words: 0 },
             { name: "Player 2", score: 0, words: 0 },
@@ -62,12 +62,10 @@
             { name: "Player 4", score: 0, words: 0 }
         ];
         
-        // Function to parse score from the game's score element
         function parseGameScore() {
             const scoreElement = document.getElementById('score');
             const scoreText = scoreElement.textContent;
             
-            // Parse "Points: X Words: Y" format
             const pointsMatch = scoreText.match(/Points:\s*(\d+)/);
             const wordsMatch = scoreText.match(/Words:\s*(\d+)/);
             
@@ -77,11 +75,9 @@
             return { points, words };
         }
         
-        // Function to update your score from the game
         function updateYourScore() {
             const gameScore = parseGameScore();
             
-            // Only update if the score has changed
             if (players[0].score !== gameScore.points || players[0].words !== gameScore.words) {
                 players[0].score = gameScore.points;
                 players[0].words = gameScore.words;
@@ -91,7 +87,6 @@
             }
         }
         
-        // Watch for changes to the game score
         function watchGameScore() {
             const scoreElement = document.getElementById('score');
             let lastScoreText = scoreElement.textContent;
@@ -101,15 +96,13 @@
                     lastScoreText = scoreElement.textContent;
                     updateYourScore();
                 }
-            }, 100); // Check every 100ms for score updates
+            }, 100);
         }
         
-        // Mock opponent score updates
         function simulateOpponentUpdates() {
             setInterval(() => {
-                // Random opponent score updates
                 for (let i = 1; i < players.length; i++) {
-                    if (Math.random() > 0.85) { // 15% chance per interval
+                    if (Math.random() > 0.85) { 
                         players[i].score += Math.floor(Math.random() * 8) + 1;
                         players[i].words += 1;
                         updatePlayerDisplay(i);
@@ -135,12 +128,9 @@
             }
         }
         
-        // Initialize multiplayer display
         function initializeMultiplayer() {
-            // Set room size (you can modify this or make it dynamic)
-            const roomSize = 2; // Change this to show more players
+            const roomSize = 2; 
             
-            // Show/hide players based on room size
             for (let i = 2; i < 4; i++) {
                 const playerCard = document.getElementById(`opponent${i}`);
                 if (i < roomSize) {
@@ -150,17 +140,12 @@
                 }
             }
             
-            // Start watching for score updates from the game
             watchGameScore();
-            
-            // Start simulating opponent updates
             simulateOpponentUpdates();
         }
         
-        // Wait for the DOM to be fully loaded before initializing
         document.addEventListener('DOMContentLoaded', initializeMultiplayer);
         
-        // Also initialize when the script loads (in case DOM is already ready)
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeMultiplayer);
         } else {
