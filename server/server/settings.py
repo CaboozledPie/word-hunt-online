@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'gameapi',
     'api',
     'corsheaders',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,15 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 CORS_ALLOW_CREDENTIALS = True
 
+# asgi websocket stuff
+
+ASGI_APPLICATION = 'server.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    }
+}

@@ -117,21 +117,30 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
 };
 
 // make the board according to letter distribution (bag w/o replacement)
-Board.prototype.generateLetters = function(letters = []) {
+Board.prototype.generateLetters = function(seed = "") {
     // make a copy of the frequency so you have a bag w/o replacement
+    if (seed !== "") {
+        if (seed.length !== this.dim() * this.dim() * 2) {
+            console.log(seed, seed.length);
+            throw new Error("invalid seed for Board.generateLetters()");
+        }
+    }
     var bag = LETTER_FREQUENCY;
     for (var row = 0; row < this.board.length; row++) {
         for (var col = 0; col < this.board[0].length; col++) {
             if (this.board[row][col] === 1) { // only make tiles at 
-                var generateRandom = Math.floor(Math.random() * bag.length);
-                var generateLetter = bag[generateRandom];
-                bag.splice(generateRandom, 1);
-                if (letters.length === this.board.length) { // this trusts that letters is a safe format!
-                   this.board[row][col] = new Tile(letters[row][col], row, col); 
+                if (seed !== "") { // we have a seed!
+                    const seedIdx = row * this.dim() + col;
+                    if (seed[seedIdx] === "0") var generateRandom = Number(seed[seedIdx + 1]);
+                    else var generateRandom = Number(seed.substring(seedIdx, seedIdx + 2));
+                    var generateLetter = bag[generateRandom];
                 }
                 else {
-                    this.board[row][col] = new Tile(generateLetter, row, col);
+                    var generateRandom = Math.floor(Math.random() * bag.length);
+                    var generateLetter = bag[generateRandom];
                 }
+                bag.splice(generateRandom, 1);
+                this.board[row][col] = new Tile(generateLetter, row, col);
             }
         }
     }

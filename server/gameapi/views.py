@@ -76,5 +76,19 @@ def matchmaking_status(request):
     token_str = token_str.split()[1]
     match = find_match_from_token(token_str)
     if match:
-        return Response({"status": "matched", "match_id": match})
+        return Response({"status": "matched", "match_id": match.id})
     return Response({"status": "waiting"})
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def get_seed(request):
+    token_str = request.headers.get("Authorization")
+    token_status = verify_token(token_str)
+    if (token_status != 1):
+        return token_status
+    token_str = token_str.split()[1]
+    match = find_match_from_token(token_str)
+    if not match:
+        return Response({"error": "no match with given token in get_seed()"})
+    return Response({"seed": match.seed})

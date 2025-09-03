@@ -1,6 +1,7 @@
 import threading
 import uuid
 import time
+import random
 
 unranked_matchmaking_queue = []
 ranked_matchmaking_queue = []
@@ -20,7 +21,16 @@ class UnrankedMatch:
         self.player1 = player1
         self.player2 = player2
         self.started = False
-        self.Board = None
+        self.scores = []
+        self.seed = ""
+        self.generate_seed()
+
+    def get_id(self):
+        return self.id
+    
+    def generate_seed(self):
+        for i in range(16): # this assumes 4x4 board dim! subject to change
+            self.seed += '%02d' % random.randint(0, 99 - i)
 
 def unranked_add_to_queue(token, account = None):
     with queue_lock:
@@ -51,7 +61,7 @@ def find_match_from_token(token: str):
     for match in unranked_matches:
         print(match.player1.session, match.player2.session)
         if match.player1.session == token or match.player2.session == token:
-            return match.id
+            return match
     return 0
 
 

@@ -202,11 +202,14 @@ const boardOffset = canvas.width / 20;
 const tileSize = (canvas.width - boardOffset * 2) / boardShape.length; // for our tests 200
 const tileOffset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
 
-// wait until dictionary is loaded before starting le game
-DICTIONARY_READY.then(() => {
-    // even this behavior should probably be sectioned off later but for now it's going in here
-    var gameBoard = new Board(boardShape);
-    gameBoard.generateLetters();
-    gameBoard.solve();
-    loop(gameBoard);
-});
+export function startGame(seed) {
+    // wait until dictionary is loaded before starting le game
+    DICTIONARY_READY.then(() => {
+        // even this behavior should probably be sectioned off later but for now it's going in here
+        var gameBoard = new Board(boardShape);
+        gameBoard.generateLetters(seed);
+        gameBoard.solve();
+        console.log("Game started with seed: ", seed);
+        loop(gameBoard);
+    });
+};
