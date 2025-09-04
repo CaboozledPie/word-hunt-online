@@ -6,6 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rankings - Wordhunt.io</title>
     <style>
+      * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #626F47 0%, #A4B465 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #F5ECD5;
+        }
+        .title{
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #F5ECD5;
+            text-shadow: 0 0 30px rgba(240, 187, 120, 0.3);
+        }
         #container {
             width: 600px;
             height: auto;
@@ -80,7 +103,7 @@
 </head>
 <body>
     <a href="index.html" class="back-button">← Back to Menu</a>
-    <h1>Rankings</h1>
+    <h1>UCLA bozo leaderboard</h1>
 
     <form id="player-form">
         <input type="text" id="name" placeholder="Player Name" required>
@@ -94,11 +117,11 @@
     <script>
         // Static leaderboard
         const staticPlayers = [
-            { name: "Player1", points: 430, words: 15 },
-            { name: "Player2", points: 580, words: 22 },
-            { name: "Player3", points: 310, words: 10 },
-            { name: "Player4", points: 640, words: 30 },
-            { name: "Player5", points: 495, words: 18 }
+            { name: "Cabooboo", points: 43000, words: 150 },
+            { name: "Gavin xpxp spamer Yang", points: 580000, words: 220 },
+            { name: "imkeeny", points: 2, words: 1 },
+            { name: "calreb", points: 32000, words: 76 },
+            { name: "pywh", points: 5000, words: 18 }
         ];
 
         // Test functionality: adding players

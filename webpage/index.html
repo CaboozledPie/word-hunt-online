@@ -12,51 +12,56 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #626F47 0%, #A4B465 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #F5ECD5;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #626F47 0%, #A4B465 100%);
+    min-height: 100vh;
+    color: #F5ECD5;
+    overflow-y: auto;  /* Allow vertical scrolling */
+    display: block;    /* Remove flex center */
+    padding: 40px 20px; /* Add some spacing */
+}
 
-        .container {
-            text-align: center;
-            background: rgba(245, 236, 213, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 50px 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(245, 236, 213, 0.2);
-        }
+.container {
+    text-align: center;
+    background: rgba(245, 236, 213, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    height: 100vh;
+    justify-content: center;
+    padding: 50px 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(245, 236, 213, 0.2);
+}
 
-        .title {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 40px;
-            color: #F5ECD5;
-            text-shadow: 0 0 30px rgba(240, 187, 120, 0.3);
-        }
+.title {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #F5ECD5;
+    text-shadow: 0 0 30px rgba(240, 187, 120, 0.3);
+}
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 600px;
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    flex: 1;
+            max-width: 1000px;
             margin: 0 auto;
-        }
+}
+html {
+        scroll-behavior: smooth; /* Enables smooth scrolling */
+    }
 
         .menu-button {
             background: linear-gradient(45deg, rgba(245, 236, 213, 0.2), rgba(245, 236, 213, 0.1));
             border: 2px solid rgba(245, 236, 213, 0.3);
             border-radius: 15px;
-            padding: 40px 30px;
+            padding: 60px 40px;
             color: #F5ECD5;
             text-decoration: none;
-            font-size: 1.4rem;
+            font-size: 2.5rem;
             font-weight: 600;
             flex-direction: column;
             cursor: pointer;
@@ -72,10 +77,17 @@
                 font-size: 2.5rem;
             }
             
-            .container {
-                padding: 30px 20px;
-                margin: 20px;
-            }
+.container {
+    text-align: center;
+    background: rgba(245, 236, 213, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 50px 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(245, 236, 213, 0.2);
+    max-width: 700px;
+    margin: 0 auto; /* Centers horizontally */
+}
             
             .menu-grid {
                 grid-template-columns: 1fr;
@@ -94,6 +106,22 @@
             transform: translateY(-5px);
             transition: all 0.3s ease;
         }
+        .credits{
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-size: 4rem;
+        }
+.about-section {
+    max-width: 1000px;
+    margin: 80px auto;
+    text-align: center;
+    font-size: 1.6rem;
+    background: rgba(245, 236, 213, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    border: 1px solid rgba(245, 236, 213, 0.2);
+    opacity: 0; /* start hidden */
+}
  </style>
 <body>
     <div class="container">
@@ -116,8 +144,41 @@
             </a>
         </div>
     </div>
+    </div>
+<!-- How to Play Section -->
+<section class="about-section">
+    <h2>How to Play</h2>
+    <p>dont be stupid lol.</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+    <p>test</p>
+   <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+    <p>test</p>
+</section>
+
+<section class="about-section">
+    <h2>Spamming</h2>
+    <p>Spamer!!!!!!!</p>
+    <p>test</p>
+    <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+   <br><br>
+    <p>test</p>
+</section>
+
+    <div class="credits">Created by Adrnrwe</div>
 </body>
-<script type="module">
+<script type="module"> // Button description animation
   import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
 
   const descriptions = {
@@ -180,4 +241,35 @@
         });
       });
   });
-</script></html> 
+</script>
+
+<script type="module">
+import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+
+const sections = document.querySelectorAll('.about-section');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      // Fade in when section enters viewport
+      animate(entry.target, {
+        opacity: [0, 1],
+        translateY: [50, 0],
+        duration: 800,
+        easing: 'easeOutQuad'
+      });
+    } else {
+      // Fade out when section leaves viewport (scrolling up)
+      animate(entry.target, {
+        opacity: [1, 0],
+        translateY: [0, 50],
+        duration: 800,
+        easing: 'easeInQuad'
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(section => observer.observe(section));
+</script>
+</html> 
