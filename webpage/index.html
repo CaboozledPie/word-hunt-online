@@ -1,25 +1,24 @@
-﻿	<!DOCTYPE html>
-	<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WordHunt.io - Main Menu</title>
- <style>
-  * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #626F47 0%, #A4B465 100%);
     min-height: 100vh;
     color: #F5ECD5;
-    overflow-y: auto;  /* Allow vertical scrolling */
-    display: block;    /* Remove flex center */
-    padding: 40px 20px; /* Add some spacing */
+    overflow-y: auto;
+    display: block;
+    padding: 40px 20px;
 }
 
 .container {
@@ -47,69 +46,64 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 40px;
     flex: 1;
-            max-width: 1000px;
-            margin: 0 auto;
+    max-width: 1000px;
+    margin: 0 auto;
 }
+
 html {
-        scroll-behavior: smooth; /* Enables smooth scrolling */
-    }
-
-        .menu-button {
-            background: linear-gradient(45deg, rgba(245, 236, 213, 0.2), rgba(245, 236, 213, 0.1));
-            border: 2px solid rgba(245, 236, 213, 0.3);
-            border-radius: 15px;
-            padding: 60px 40px;
-            color: #F5ECD5;
-            text-decoration: none;
-            font-size: 2.5rem;
-            font-weight: 600;
-            flex-direction: column;
-            cursor: pointer;
-            min-height: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2.5rem;
-            }
-            
-.container {
-    text-align: center;
-    background: rgba(245, 236, 213, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 50px 40px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(245, 236, 213, 0.2);
-    max-width: 700px;
-    margin: 0 auto; /* Centers horizontally */
+    scroll-behavior: smooth;
 }
-            
-            .menu-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .menu-button {
-                min-height: 120px;
-                padding: 30px 20px;
-                font-size: 1.2rem;
-            }
-        }
-        .menu-button:hover {
-            background: linear-gradient(45deg, rgba(245, 236, 213, 0.3), rgba(245, 236, 213, 0.2));
-            box-shadow: 0 8px 15px rgba(245, 236, 213, 0.2);
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-        }
-        .credits{
-             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              font-size: 4rem;
-        }
+
+.menu-button {
+    background: linear-gradient(45deg, rgba(245, 236, 213, 0.2), rgba(245, 236, 213, 0.1));
+    border: 2px solid rgba(245, 236, 213, 0.3);
+    border-radius: 15px;
+    padding: 60px 40px;
+    color: #F5ECD5;
+    text-decoration: none;
+    font-size: 2.5rem;
+    font-weight: 600;
+    flex-direction: column;
+    cursor: pointer;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .menu-button {
+        min-height: 120px;
+        padding: 30px 20px;
+        font-size: 1.2rem;
+    }
+}
+
+.menu-button:hover {
+    background: linear-gradient(45deg, rgba(245, 236, 213, 0.3), rgba(245, 236, 213, 0.2));
+    box-shadow: 0 8px 15px rgba(245, 236, 213, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.credits {
+    font-size: 4rem;
+    text-align: center;
+    margin-top: 50px;
+}
+
 .about-section {
     max-width: 1000px;
     margin: 80px auto;
@@ -120,156 +114,157 @@ html {
     padding: 20px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     border: 1px solid rgba(245, 236, 213, 0.2);
-    opacity: 0; /* start hidden */
+    opacity: 0;
 }
- </style>
+</style>
+</head>
 <body>
-    <div class="container">
-        <h1 class="title">Wordhunt</h1>
-        
-        <div class="menu-grid">
-            <a href="quickplay.html" class="menu-button">
-                Quickplay
-            </a>
-            <a href="multiplayer.html" class="menu-button">
-                Multiplayer
-            </a>
-            
-            <a href="leaderboards.html" class="menu-button">
-                Leaderboards
-            </a>
-            
-            <a href="settings.html" class="menu-button">
-                Settings
-            </a>
-        </div>
+<div class="container">
+    <h1 class="title">Wordhunt</h1>
+    <div class="menu-grid">
+        <a href="quickplay.html" class="menu-button" data-target="quickplay.html">Quickplay</a>
+        <a href="multiplayer.html" class="menu-button" data-target="multiplayer.html">Multiplayer</a>
+        <a href="leaderboards.html" class="menu-button" data-target="leaderboards.html">Leaderboards</a>
+        <a href="settings.html" class="menu-button" data-target="settings.html">Settings</a>
     </div>
-    </div>
+</div>
+
 <!-- How to Play Section -->
 <section class="about-section">
     <h2>How to Play</h2>
     <p>dont be stupid lol.</p>
-    <p>test</p>
-    <p>test</p>
-    <p>test</p>
-    <p>test</p>
-    <p>test</p>
-   <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
+    <br><br>
     <p>test</p>
 </section>
 
 <section class="about-section">
     <h2>Spamming</h2>
     <p>Spamer!!!!!!!</p>
-    <p>test</p>
     <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
-   <br><br>
     <p>test</p>
 </section>
 
-    <div class="credits">Created by Adrnrwe</div>
-</body>
-<script type="module"> // Button description animation
-  import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+<div class="credits">Created by Adrnrwe</div>
 
-  const descriptions = {
+<script type="module">
+import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+
+// Initial fade-in on page load
+window.addEventListener('load', () => {
+    animate('.container, .menu-grid', {
+        opacity: [0, 1],
+        transform: ['translateY(30px)', 'translateY(0)'],
+        duration: 1200,
+        easing: 'easeOutQuad',
+        delay: (el, i) => i * 200
+    });
+});
+
+// Toggleable loading screen config
+const loadingConfig = {
+    quickplay: false,
+    multiplayer: false,
+    settings: false,
+    leaderboards: true
+};
+
+document.querySelectorAll('.menu-button').forEach(button => {
+    button.addEventListener('click', event => {
+        const page = button.getAttribute('data-target');
+        const key = page.replace('.html', '');
+
+        if (loadingConfig[key]) {
+            event.preventDefault();
+            window.location.href = `loading.html?target=${page}`;
+        }
+    });
+});
+
+// Button hover animation with descriptions
+const descriptions = {
     "Quickplay": "play",
     "Multiplayer": "yo",
     "Leaderboards": "wordhunt",
     "Settings": "adrnrwe"
-  };
+};
 
-  document.querySelectorAll('.menu-button').forEach(btn => {
-      const text = btn.textContent.trim();
-      const descText = descriptions[text] || "";
+document.querySelectorAll('.menu-button').forEach(btn => {
+    const text = btn.textContent.trim();
+    const descText = descriptions[text] || "";
 
-      btn.innerHTML = `
+    btn.innerHTML = `
         <div class="button-text">
           ${text.split('').map(char => `<span class="letter">${char}</span>`).join('')}
         </div>
         <div class="button-desc" style="opacity: 0; transform: translateY(20px); font-size: 0.9rem; margin-top: 8px;">
           ${descText}
         </div>
-      `;
-      const letters = btn.querySelectorAll('.letter');
-      const desc = btn.querySelector('.button-desc');
-      const buttonText = btn.querySelector('.button-text');
+    `;
 
-      btn.addEventListener('mouseenter', () => {
+    const letters = btn.querySelectorAll('.letter');
+    const desc = btn.querySelector('.button-desc');
+    const buttonText = btn.querySelector('.button-text');
+
+    btn.addEventListener('mouseenter', () => {
         animate(letters, {
-          translateY: { to: [0, -40], duration: 400 },
-
-          ease: 'outQuad'
+            translateY: { to: [0, -40], duration: 400 },
+            ease: 'outQuad'
         });
 
         animate(buttonText, {
-          scale: { to: [1, 0.75], duration: 300 },
-          ease: 'outQuad'
+            scale: { to: [1, 0.75], duration: 300 },
+            ease: 'outQuad'
         });
 
         animate(desc, {
-          opacity: { to: [0, 1], duration: 400 },
-          translateY: { to: [20, 0], duration: 400 },
-          ease: 'outQuad'
+            opacity: { to: [0, 1], duration: 400 },
+            translateY: { to: [20, 0], duration: 400 },
+            ease: 'outQuad'
         });
-      });
-    
-      // Hover Out
-      btn.addEventListener('mouseleave', () => {
+    });
+
+    btn.addEventListener('mouseleave', () => {
         animate(letters, {
-          translateY: { to: [-40, 0], duration: 300 },
-          ease: 'inQuad'
+            translateY: { to: [-40, 0], duration: 300 },
+            ease: 'inQuad'
         });
-   
+
         animate(buttonText, {
-          scale: { to: [0.75, 1], duration: 300 },
-          ease: 'inQuad'
+            scale: { to: [0.75, 1], duration: 300 },
+            ease: 'inQuad'
         });
-    animate(desc, {
-          opacity: { to: [1, 0], duration: 300 },
-          translateY: { to: [0, 20], duration: 300 },
-          ease: 'inQuad'
+
+        animate(desc, {
+            opacity: { to: [1, 0], duration: 300 },
+            translateY: { to: [0, 20], duration: 300 },
+            ease: 'inQuad'
         });
-      });
-  });
-</script>
+    });
+});
 
-<script type="module">
-import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
-
+// Scroll fade-in/out for about sections
 const sections = document.querySelectorAll('.about-section');
-
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      // Fade in when section enters viewport
-      animate(entry.target, {
-        opacity: [0, 1],
-        translateY: [50, 0],
-        duration: 800,
-        easing: 'easeOutQuad'
-      });
-    } else {
-      // Fade out when section leaves viewport (scrolling up)
-      animate(entry.target, {
-        opacity: [1, 0],
-        translateY: [0, 50],
-        duration: 800,
-        easing: 'easeInQuad'
-      });
-    }
-  });
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animate(entry.target, {
+                opacity: [0, 1],
+                translateY: [50, 0],
+                duration: 800,
+                easing: 'easeOutQuad'
+            });
+        } else {
+            animate(entry.target, {
+                opacity: [1, 0],
+                translateY: [0, 50],
+                duration: 800,
+                easing: 'easeInQuad'
+            });
+        }
+    });
 }, { threshold: 0.3 });
 
 sections.forEach(section => observer.observe(section));
 </script>
-</html> 
+</body>
+</html>
