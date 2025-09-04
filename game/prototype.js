@@ -7,9 +7,7 @@ const ctx = canvas.getContext("2d");
 let mouseX = canvas.width/2, mouseY = canvas.height/2;
 let mouseIsPressed = false;
 let mouseIsReleased = false;
-let mouseLeft = false;
-
-// grab mouseX, mouseY
+let mouseLeft = false;// grab mouseX, mouseY
 canvas.addEventListener("mousemove",
     e => {
         const rect = canvas.getBoundingClientRect();
@@ -39,8 +37,8 @@ const tileSkin = {
     invalid: new Image()
 };
 
-const imgPath = "./game/skins/skindefault/";
-tileSkin.board.src = "./game/skins/skindefault/board.png";
+const imgPath = "../game/skins/skindefault/";
+tileSkin.board.src = "../game/skins/skindefault/board.png";
 tileSkin.none.src = imgPath + "tile.png";
 tileSkin.hover.src = imgPath + "tilehover.png";
 tileSkin.click.src = imgPath + "tileclick.png";
@@ -50,7 +48,7 @@ tileSkin.invalid.src = imgPath + "tileinvalid.png";
 /** ACTUALLY RUNNING THE GAME **/
 
 // we can put this in a better place later, just putting it here for now
-var drawTile = function(tile) {
+ var drawTile = function(tile) {
     const img = tileSkin[tile.getStatus()];
 
     if (img.complete) { // make sure img loaded
@@ -183,10 +181,10 @@ function loop(wordBoard) {
                 }
             }
         }
-    }
+    } 
 
     /** dom stuffs **/
-    document.getElementById("score").textContent = `Points: ${wordBoard.getScore()} Words: ${wordBoard.getWordCount()}`;
+  document.getElementById("score").textContent = `Points: ${wordBoard.getScore()} Words: ${wordBoard.getWordCount()}`;
     
     requestAnimationFrame(() => loop(wordBoard));
     mouseIsReleased = false; // i have to do this for this logic to work, no getting around it

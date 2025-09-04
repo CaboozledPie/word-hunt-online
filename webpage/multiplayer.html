@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="quickplay.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer - Wordhunt.io</title>
+    <link rel="stylesheet" href="multiplayer.css">
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back</a>
+    
+    <div class="main-header">
+        Multiplayer
+    </div>
+    <div class="game-container">
+        <script src="/game/prototype.js" type="module"></script>
+    </div>
+    <div id="score" style="display: none;">Points: 0 Words: 0</div>
+    <div id="status"></div>
+    
+    <div class="multiplayer-container">
+        <div class="game-section">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+        </div>
+        
+        <div class="players-section">
+            <div class="header">Players</div>
+            
+            <div class="player-card current-player">
+                <div class="player-name">You</div>
+                <div class="player-score" id="yourScore">Points: 0</div>
+                <div class="player-words" id="yourWords">Words: 0</div>
+            </div>
+            
+            <div class="player-card" id="opponent1">
+                <div class="player-name">Player 2</div>
+                <div class="player-score">Points: 0</div>
+                <div class="player-words">Words: 0</div>
+            </div>
+            
+            <div class="player-card" id="opponent2" style="display: none;">
+                <div class="player-name">Player 3</div>
+                <div class="player-score">Points: 0</div>
+                <div class="player-words">Words: 0</div>
+            </div>
+            
+            <div class="player-card" id="opponent3" style="display: none;">
+                <div class="player-name">Player 4</div>
+                <div class="player-score">Points: 0</div>
+                <div class="player-words">Words: 0</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+ // TODO: Rewrite the chatgpt bullshit to smth
+        let players = [
+            { name: "You", score: 0, words: 0 },
+            { name: "Player 2", score: 0, words: 0 },
+            { name: "Player 3", score: 0, words: 0 },
+            { name: "Player 4", score: 0, words: 0 }
+        ];
+        
+        function parseGameScore() {
+            const scoreElement = document.getElementById('score');
+            const scoreText = scoreElement.textContent;
+            
+            const pointsMatch = scoreText.match(/Points:\s*(\d+)/);
+            const wordsMatch = scoreText.match(/Words:\s*(\d+)/);
+            
+            const points = pointsMatch ? parseInt(pointsMatch[1]) : 0;
+            const words = wordsMatch ? parseInt(wordsMatch[1]) : 0;
+            
+            return { points, words };
+        }
+        
+        function updateYourScore() {
+            const gameScore = parseGameScore();
+            
+            if (players[0].score !== gameScore.points || players[0].words !== gameScore.words) {
+                players[0].score = gameScore.points;
+                players[0].words = gameScore.words;
+                
+                document.getElementById('yourScore').textContent = `Points: ${players[0].score}`;
+                document.getElementById('yourWords').textContent = `Words: ${players[0].words}`;
+            }
+        }
+        
+        function watchGameScore() {
+            const scoreElement = document.getElementById('score');
+            let lastScoreText = scoreElement.textContent;
+            
+            setInterval(() => {
+                if (scoreElement.textContent !== lastScoreText) {
+                    lastScoreText = scoreElement.textContent;
+                    updateYourScore();
+                }
+            }, 100);
+        }
+        
+        function simulateOpponentUpdates() {
+            setInterval(() => {
+                for (let i = 1; i < players.length; i++) {
+                    if (Math.random() > 0.85) { 
+                        players[i].score += Math.floor(Math.random() * 8) + 1;
+                        players[i].words += 1;
+                        updatePlayerDisplay(i);
+                    }
+                }
+            }, 2000);
+        }
+        
+        function updatePlayerDisplay(playerIndex) {
+            if (playerIndex === 0) {
+                document.getElementById('yourScore').textContent = `Points: ${players[0].score}`;
+                document.getElementById('yourWords').textContent = `Words: ${players[0].words}`;
+            } else {
+                const playerCard = document.getElementById(`opponent${playerIndex}`);
+                if (playerCard && playerCard.style.display !== 'none') {
+                    const scoreElement = playerCard.querySelector('.player-score');
+                    const wordsElement = playerCard.querySelector('.player-words');
+                    if (scoreElement && wordsElement) {
+                        scoreElement.textContent = `Points: ${players[playerIndex].score}`;
+                        wordsElement.textContent = `Words: ${players[playerIndex].words}`;
+                    }
+                }
+            }
+        }
+        
+        function initializeMultiplayer() {
+            const roomSize = 2; 
+            
+            for (let i = 2; i < 4; i++) {
+                const playerCard = document.getElementById(`opponent${i}`);
+                if (i < roomSize) {
+                    playerCard.style.display = 'block';
+                } else {
+                    playerCard.style.display = 'none';
+                }
+            }
+            
+            watchGameScore();
+            simulateOpponentUpdates();
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeMultiplayer);
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMultiplayer);
+        } else {
+            initializeMultiplayer();
+        }
+    </script>
+</body>
+</html>
