@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings - Wordhunt.io</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #626F47 0%, #A4B465 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            color: #F5ECD5;
+            padding: 40px 20px;
+            opacity: 0; /* Start hidden for fade-in */
+            filter: blur(10px);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #F5ECD5;
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #F5ECD5;
+            text-shadow: 0 0 30px rgba(240, 187, 120, 0.3);
+            text-align: center;
+        }
+
+        #leaderboard-container {
+            background: rgba(245, 236, 213, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(245, 236, 213, 0.2);
+            width: 700px;
+            max-width: 95%;
+            margin-top: 20px;
+        }
+
+        #header-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 12px 16px;
+            border-bottom: 2px solid rgba(245, 236, 213, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .header-name { width: 50%; }
+        .header-score, .header-words { width: 25%; text-align: right; }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            color: #F5ECD5;
+        }
+
+        .row:nth-child(even) {
+            background: rgba(245, 236, 213, 0.05);
+        }
+
+        .row:nth-child(odd) {
+            background: rgba(245, 236, 213, 0.1);
+        }
+
+        /* All rows have bold font */
+        .row {
+            font-weight: bold;
+        }
+
+        /* Top 3 rows with outlined styling */
+        .row.top-1 {
+            background: rgba(245, 236, 213, 0.05);
+            border: 3px solid #FFD700;
+            color: #F5ECD5;
+        }
+
+        .row.top-2 {
+            background: rgba(245, 236, 213, 0.05);
+            border: 3px solid #C0C0C0;
+            color: #F5ECD5;
+        }
+
+        .row.top-3 {
+            background: rgba(245, 236, 213, 0.05);
+            border: 3px solid #CD7F32;
+            color: #F5ECD5;
+        }
+
+        .row:hover {
+            transform: translateY(-3px);
+        }
+
+        .name { width: 50%; }
+        .score, .words { width: 25%; text-align: right; }
+
+        #player-form {
+            width: 700px;
+            max-width: 95%;
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        #player-form input {
+            padding: 8px;
+            font-size: 16px;
+            flex: 1;
+            border-radius: 8px;
+            border: none;
+        }
+
+        #player-form button {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background: rgba(245, 236, 213, 0.2);
+            color: #F5ECD5;
+        }
+
+        #player-form button:hover {
+            background: rgba(245, 236, 213, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Back to Menu</a>
+    <h1 class="title">Leaderboards</h1>
+
+    <form id="player-form">
+        <input type="text" id="name" placeholder="Player Name" required>
+        <input type="number" id="points" placeholder="Points" required>
+        <input type="number" id="words" placeholder="Words" required>
+        <button type="submit">Add Player</button>
+    </form>
+
+    <div id="leaderboard-container">
+        <div id="header-row">
+            <div class="header-name"></div>
+            <div class="header-score">Points</div>
+            <div class="header-words">Words</div>
+        </div>
+        <div id="container"></div>
+    </div>
+
+    <script type="module">
+        import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+        // Fade in body content
+        animate('body', {
+            opacity: [0, 1],
+            filter: ['blur(10px)', 'blur(0px)'],
+            duration: 500,
+            easing: 'easeInOutQuad'
+        });
+
+        // Static leaderboard
+        const staticPlayers = [
+            { name: "Cabooboo", points: 43000, words: 150 },
+            { name: "Gavin xpxp spamer Yang", points: 580000, words: 220 },
+            { name: "imkeeny", points: 2, words: 1 },
+            { name: "calreb", points: 32000, words: 76 },
+            { name: "pywh", points: 5000, words: 18 }
+        ];
+
+        let dynamicPlayers = [];
+
+        const container = document.querySelector('#container');
+        const form = document.querySelector('#player-form');
+
+        function renderLeaderboard() {
+            container.innerHTML = '';
+            const allPlayers = [...staticPlayers, ...dynamicPlayers];
+            allPlayers.sort((a, b) => b.points - a.points);
+
+            allPlayers.forEach((player, index) => {
+                let row = document.createElement('div');
+                row.classList.add('row');
+
+                if (index === 0) row.classList.add('top-1');
+                if (index === 1) row.classList.add('top-2');
+                if (index === 2) row.classList.add('top-3');
+
+                row.innerHTML = `
+                    <div class="name">${player.name}</div>
+                    <div class="score">${player.points}</div>
+                    <div class="words">${player.words}</div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.querySelector('#name').value.trim();
+            const points = parseInt(document.querySelector('#points').value);
+            const words = parseInt(document.querySelector('#words').value);
+
+            if (name && !isNaN(points) && !isNaN(words)) {
+                dynamicPlayers.push({ name, points, words });
+                renderLeaderboard();
+                form.reset();
+            }
+        });
+
+        renderLeaderboard(); // test
+    </script>
+</body>
+</html>

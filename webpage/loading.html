@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #626F47;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #loading-balls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .ball {
+            width: 12px;
+            height: 12px;
+            background-color: #F5ECD5;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .progress-text {
+            font-size: 1.5rem;
+            color: #F5ECD5;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-balls"></div>
+    <div class="progress-text" id="progress-text">0%</div>
+
+    <script type="module">
+        import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
+
+        const ballContainer = document.getElementById('loading-balls');
+        const progressText = document.getElementById('progress-text');
+
+        // Create balls
+        const numBalls = 20;
+        for (let i = 0; i < numBalls; i++) {
+            const ball = document.createElement('div');
+            ball.classList.add('ball');
+            ballContainer.appendChild(ball);
+        }
+
+        const balls = document.querySelectorAll('.ball');
+
+        // Animate balls bounce loop
+        animate(balls, {
+            translateY: [
+                { value: -20, duration: 500 },
+                { value: 0, duration: 500 }
+            ],
+            delay: (el, i) => i * 100,
+            loop: true,
+            easing: 'easeInOutQuad'
+        });
+
+        // Simulate loading progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 8;
+            if (progress > 100) progress = 100;
+            progressText.textContent = progress + '%';
+
+            // Fill balls based on progress
+            const filledBalls = Math.floor((progress / 100) * numBalls);
+            balls.forEach((ball, i) => {
+                ball.style.opacity = i < filledBalls ? '1' : '0.3';
+            });
+
+            if (progress === 100) {
+                clearInterval(progressInterval);
+
+                // Fade out and blur page, then redirect
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetPage = urlParams.get('target') || 'leaderboards.html';
+
+                animate(document.body, {
+                    opacity: [1, 0],
+                    filter: ['blur(0px)', 'blur(20px)'],
+                    duration: 1500,
+                    easing: 'easeInOutQuad',
+                    complete: () => {
+                        window.location.href = targetPage;
+                    }
+                });
+            }
+        }, 50);
+    </script>
+</body>
+</html>
