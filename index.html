@@ -122,10 +122,11 @@ html {
 <div class="container">
     <h1 class="title">Wordhunt</h1>
     <div class="menu-grid">
-        <a href="quickplay.html" class="menu-button" data-target="quickplay.html">Quickplay</a>
-        <a href="multiplayer.html" class="menu-button" data-target="multiplayer.html">Multiplayer</a>
-        <a href="leaderboards.html" class="menu-button" data-target="leaderboards.html">Leaderboards</a>
-        <a href="settings.html" class="menu-button" data-target="settings.html">Settings</a>
+<a href="quickplay.html" class="menu-button" data-target="quickplay.html">Quickplay</a>
+<a href="multiplayer.html" class="menu-button" data-target="multiplayer.html">Multiplayer</a>
+<a href="leaderboards.html" class="menu-button" data-target="leaderboards.html">Leaderboards</a>
+<a href="/webpage/settings.html" class="menu-button" data-target="settings.html">Settings</a>
+
     </div>
 </div>
 
@@ -147,7 +148,7 @@ html {
 <div class="credits">Created by Adrnrwe</div>
 
 <script type="module">
-import { animate } from 'https://cdn.jsdelivr.net/npm/motion@latest/+esm';
+import { animate } from 'https://cdn.jsdelivr.net/npm/animejs/+esm';
 
 // Initial fade-in on page load
 window.addEventListener('load', () => {
@@ -175,7 +176,13 @@ document.querySelectorAll('.menu-button').forEach(button => {
 
         if (loadingConfig[key]) {
             event.preventDefault();
-            window.location.href = `loading.html?target=${page}`;
+            // Use absolute path to prevent doubling
+            window.location.href = `/webpage/loading.html?target=${page}`;
+        }
+        // For direct navigation, also use absolute paths
+        else {
+            event.preventDefault();
+            window.location.href = `/webpage/${page}`;
         }
     });
 });
@@ -265,5 +272,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 
 sections.forEach(section => observer.observe(section));
+</script>
 </body>
 </html>

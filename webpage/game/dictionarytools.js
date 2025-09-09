@@ -41,8 +41,9 @@ Trie.prototype.has = function(word) {
 
 /** CALL BEFORE GAME TO LOAD DICTIONARY **/
 export const DICTIONARY = new Trie();
-
-export const DICTIONARY_READY = fetch("game/dictionary.txt")
+console.log("Current location:", window.location.href);
+console.log("Attempting to fetch from:", new URL("../game/dictionary.txt", window.location.href).href);
+export const DICTIONARY_READY = fetch("./game/dictionary.txt")
     .then(response => response.text())
     .then(text => { // split lines, trim, remove empty, put in array
         const DICT_ARR = text.split("\n").map(w => w.trim()).filter(Boolean);

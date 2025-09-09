@@ -37,8 +37,8 @@ const tileSkin = {
     invalid: new Image()
 };
 
-const imgPath = "../game/skins/skindefault/";
-tileSkin.board.src = "../game/skins/skindefault/board.png";
+const imgPath = "/game/skins/skindefault/";
+tileSkin.board.src = "/game/skins/skindefault/board.png";
 tileSkin.none.src = imgPath + "tile.png";
 tileSkin.hover.src = imgPath + "tilehover.png";
 tileSkin.click.src = imgPath + "tileclick.png";
@@ -48,7 +48,7 @@ tileSkin.invalid.src = imgPath + "tileinvalid.png";
 /** ACTUALLY RUNNING THE GAME **/
 
 // we can put this in a better place later, just putting it here for now
- var drawTile = function(tile) {
+var drawTile = function(tile) {
     const img = tileSkin[tile.getStatus()];
 
     if (img.complete) { // make sure img loaded
@@ -128,7 +128,7 @@ function loop(wordBoard) {
             const prevRow = prevTile.getRow();
             const prevCol = prevTile.getCol();
             for (var row = Math.max(0, prevRow-1); row < Math.min(wordBoard.dim(), prevRow+2); row++) {
-                for (var col = Math.max(0, prevCol-1); col < Math.max(wordBoard.dim(), prevCol+2); col++) {
+                for (var col = Math.max(0, prevCol-1); col < Math.min(wordBoard.dim(), prevCol+2); col++) {
                     if (wordBoard.getTile(row, col) !== 0) { // ignore blank tiles
                         const tileCenterX = boardOffset + col * tileSize + tileSize/2;
                         const tileCenterY = boardOffset + row * tileSize + tileSize/2;
@@ -156,13 +156,13 @@ function loop(wordBoard) {
         wordBoard.clearAnimations();
         mouseIsPressed = false; // we should not accidentally drag
     }
-    if (mouseTileRow !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
+    if (mouseTileRow !== -1 && mouseTileCol !== -1 && !mouseIsPressed && !mouseLeft) { // hover, should work if stationary also
         const hoverStatus = wordBoard.newHover(mouseTileRow, mouseTileCol);
         if (hoverStatus) {
             wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("hover");
         }
     }
-    if (mouseTileRow !== -1 && mouseIsPressed) {
+    if (mouseTileRow !== -1 && mouseTileCol !== -1 && mouseIsPressed) {
         const clickStatus = wordBoard.selectTile(mouseTileRow, mouseTileCol);
         if (clickStatus) {
             wordBoard.getTile(mouseTileRow, mouseTileCol).beginAnimation("click");
@@ -181,10 +181,10 @@ function loop(wordBoard) {
                 }
             }
         }
-    } 
+    }
 
     /** dom stuffs **/
-  document.getElementById("score").textContent = `Points: ${wordBoard.getScore()} Words: ${wordBoard.getWordCount()}`;
+    document.getElementById("score").textContent = `Points: ${wordBoard.getScore()} Words: ${wordBoard.getWordCount()}`;
     
     requestAnimationFrame(() => loop(wordBoard));
     mouseIsReleased = false; // i have to do this for this logic to work, no getting around it
