@@ -142,6 +142,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "Authorization",
+    "matchId",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -157,4 +158,13 @@ CHANNEL_LAYERS = {
             "hosts": [("127.0.0.1", 6379)],
         },
     }
+}
+
+# redis stuff
+
+REDIS_CONFIG = {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0,
+    "decode_responses": True
 }

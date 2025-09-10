@@ -103,7 +103,7 @@ Tile.prototype.getAnimationType = function() {
 };
 
 /**this board class is basically the entire game. everything relevant is in here.**/
-var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfilled, 1 for filled
+var Board = function(shape, skin = "skindefault", socket = null) { // input shape as 0 for unfilled, 1 for filled
     if (shape.length !== shape[0].length) {
         throw new Error("board shape must be inputted as square for Board() constructor");
     }
@@ -114,6 +114,7 @@ var Board = function(shape, skin = "skindefault") { // input shape as 0 for unfi
     this.usedWords = new Set(); // hashmap for yellow
     this.score = 0;
     this.key = []; // sorted list of answers
+    this.socket = socket
 };
 
 // make the board according to letter distribution (bag w/o replacement)
@@ -130,7 +131,7 @@ Board.prototype.generateLetters = function(seed = "") {
         for (var col = 0; col < this.board[0].length; col++) {
             if (this.board[row][col] === 1) { // only make tiles at 
                 if (seed !== "") { // we have a seed!
-                    const seedIdx = row * this.dim() + col;
+                    const seedIdx = (row * this.dim() + col) * 2;
                     if (seed[seedIdx] === "0") var generateRandom = Number(seed[seedIdx + 1]);
                     else var generateRandom = Number(seed.substring(seedIdx, seedIdx + 2));
                     var generateLetter = bag[generateRandom];
@@ -257,6 +258,18 @@ Board.prototype.clearGuess = function() { // call every time mouse is released
             guess += this.currentWord[i].getLetter();
         }
         this.usedWords.add(guess);
+
+        // it's socketing time
+        if (this.socket) {
+            this.socket.send(JSON.stringify({
+                type: "foundWord",
+                info: {
+                    word: guess,
+                    length: this.currentWord.length,
+                }
+            }));
+        }
+        else console.log("no socket word");
     }
     
     // reset all tiles
@@ -327,4 +340,34 @@ Board.prototype.getWordCount = function() {
     return this.usedWords.size;
 };
 
-export {Tile, Board};
+var GameTimer = function(duration, onTick, onEnd) {
+    this.duration = duration; // in seconds
+    this.remaining = duration;
+    this.interval = null;
+    this.onTick = onTick; // function on tick
+    this.onEnd = onEnd; // function on end
+    this.active = false;
+}
+
+GameTimer.prototype.start = function() {
+    if (this.running) return; // if running can't start
+    this.running = true;
+
+    this.interval = setInterval(() => {
+        this.remaining -= 1;
+        if (this.onTick) this.onTick(this.remaining);
+
+        if (this.remaining <= 0) {
+            this.stop();
+            if (this.onEnd) this.onEnd();
+        }
+    }, 1000);
+}
+
+GameTimer.prototype.stop = function() {
+    clearInterval(this.interval);
+    this.remaining = 0;
+    this.running = false;
+}
+
+export {Tile, Board, GameTimer};

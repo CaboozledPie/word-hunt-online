@@ -1,69 +1,94 @@
+from django.conf import settings
 import threading
 import uuid
 import time
 import random
+import json
+from .redis_client import redis_client
 
-unranked_matchmaking_queue = []
-ranked_matchmaking_queue = []
+#redis_client.rpush("queue:ranked")
+#redis_client.rpush("matches:ranked")
 
-unranked_matches = []
 
-queue_lock = threading.Lock()
+def create_match(player1, player2): # this models what a data is in a match. SUBJECT TO CHANGE 
+    ret_dict = {
+        "match_id": f"match_{uuid.uuid4()}",
+        "players": {
+            player1["session"]: {
+                "finished": False,
+                "last_seen": None,
+                "score": 0,
+            },
+            player2["session"]: {
+                "finished": False,
+                "last_seen": None,
+                "score": 0,
+            },
+        },
+        "accounts": {
+            player1["session"]: player1["account"],
+            player2["session"]: player2["account"],
+        },
+        "active": False,
+        "seed": "",
+    }
+    for i in range(16): # this assumes 4x4 board dim! subject to change
+        ret_dict["seed"] += '%02d' % random.randint(0, 99 - i)
+    return ret_dict
 
-class MatchmakingEntry:
-    def __init__(self, session: str, account: str):
-        self.session = session
-        self.account = account # if None, block from ranked
-
-class UnrankedMatch:
-    def __init__(self, player1: MatchmakingEntry, player2: MatchmakingEntry):
-        self.id = f"match_{uuid.uuid4()}"
-        self.player1 = player1
-        self.player2 = player2
-        self.started = False
-        self.scores = []
-        self.seed = ""
-        self.generate_seed()
-
-    def get_id(self):
-        return self.id
-    
-    def generate_seed(self):
-        for i in range(16): # this assumes 4x4 board dim! subject to change
-            self.seed += '%02d' % random.randint(0, 99 - i)
-
-def unranked_add_to_queue(token, account = None):
-    with queue_lock:
-        if token not in unranked_matchmaking_queue:
-            unranked_matchmaking_queue.append(MatchmakingEntry(token, account))
+def unranked_add_to_queue(token, account=None):
+    raw = redis_client.hget("queue:unranked", token)
+    if raw is None:
+        matchmaking_entry = {
+            "session": token,
+            "account": account,
+        }
+        redis_client.hset("queue:unranked", token, json.dumps(matchmaking_entry))
 
 def unranked_remove_from_queue(token):
-    with queue_lock:
-        for i in unranked_matchmaking_queue:
-            if token == i.session:
-                unranked_matchmaking_queue.remove(i)
+    redis_client.hdel("queue:unranked", token)
 
 def unranked_get_queue():
-    with queue_lock:
-        return list(unranked_matchmaking_queue)
+    return redis_client.smembers("queue:unranked")
 
 def unranked_matchmaker_loop():
     while True:
-        with queue_lock:
-            while len(unranked_matchmaking_queue) >= 2:
-                player1 = unranked_matchmaking_queue.pop(0)
-                player2 = unranked_matchmaking_queue.pop(0)
-                print(f"Matched {player1.session} vs {player2.session}")
-                unranked_matches.append(UnrankedMatch(player1, player2))
+        queue_keys = redis_client.hkeys("queue:unranked")
+        while len(queue_keys) >= 2:
+            key1, key2 = queue_keys[:2]
+            player1_raw = redis_client.hget("queue:unranked", key1)
+            player2_raw = redis_client.hget("queue:unranked", key2)
+
+            player1 = json.loads(player1_raw)
+            player2 = json.loads(player2_raw)
+
+            print(f"Matched {player1['session']} vs {player2['session']}")
+
+            redis_client.hdel("queue:unranked", key1, key2)
+
+            match = create_match(player1, player2)
+            redis_client.hset("matches:unranked", match["match_id"], json.dumps(match))
+
+            # allow for quick indexing from player
+            redis_client.hset("matches:players", player1["session"], match["match_id"])
+            redis_client.hset("matches:players", player2["session"], match["match_id"])
+            
+            queue_keys = redis_client.hkeys("queue:unranked")
         time.sleep(5)
 
-def find_match_from_token(token: str):
-    for match in unranked_matches:
-        print(match.player1.session, match.player2.session)
-        if match.player1.session == token or match.player2.session == token:
-            return match
-    return 0
+def find_match_from_token(token: str): # find match from PLAYER token
+    match_id = redis_client.hget("matches:players", token)
+    if not match_id:
+        return False
+    match = json.loads(redis_client.hget("matches:unranked", match_id))
+    if (not match):
+        return False
+    return match
 
-
+def find_match_from_id(match_id: str):
+    match = json.loads(redis_client.hget("matches:unranked", match_id))
+    if (not match):
+        return False
+    return match
 
 threading.Thread(target=unranked_matchmaker_loop, daemon=True).start()

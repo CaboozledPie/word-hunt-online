@@ -11,16 +11,25 @@
     <div class="game-container">
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div id="score">Points: 0 Words: 0</div>
+        <div id="timer">Timer: 80</div>
     </div>
 
     <script type="module">
     import { startGame } from "./game/prototype.js";
     async function init() {
-        const seed = await getSeed();
-        startGame(seed);
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get("match_id");
+        const webSocket = await window.connectSocket(matchId);
+        const seed = await getSeed(matchId);
+        window.addEventListener("beforeunload", () => {
+            pageClose(sessionStorage.getItem("frontendToken"), webSocket);
+        });
+        if (seed) startGame(seed, webSocket);
+        else alert("failed to generate seed");
     };
-    
-    init();
+    document.addEventListener("DOMContentLoaded", () => {
+        init().catch(err => console.error("Init error:", err));
+    });
     </script>
 </body>
 </html>

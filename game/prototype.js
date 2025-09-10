@@ -1,4 +1,4 @@
-import {Tile, Board} from "./board.js";
+import {Tile, Board, GameTimer} from "./board.js";
 import {DICTIONARY_READY} from "./dictionarytools.js";
 
 const canvas = document.getElementById("gameCanvas");
@@ -202,14 +202,23 @@ const boardOffset = canvas.width / 20;
 const tileSize = (canvas.width - boardOffset * 2) / boardShape.length; // for our tests 200
 const tileOffset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
 
-export function startGame(seed) {
+export function startGame(seed, socket = null, timer = 80) {
     // wait until dictionary is loaded before starting le game
     DICTIONARY_READY.then(() => {
         // even this behavior should probably be sectioned off later but for now it's going in here
-        var gameBoard = new Board(boardShape);
+        var gameBoard = new Board(boardShape, "skindefault", socket);
+        var gameTimer = new GameTimer(timer,
+            (remaining) => { // called each tick
+                document.getElementById("timer").textContent = `Time Remaining: ${remaining}`
+            },
+            () => { // called on timer end
+                alert("out of time gg"); // SUBJECT TO CHANGE
+            }
+        );
         gameBoard.generateLetters(seed);
         gameBoard.solve();
         console.log("Game started with seed: ", seed);
+        gameTimer.start();
         loop(gameBoard);
     });
 };

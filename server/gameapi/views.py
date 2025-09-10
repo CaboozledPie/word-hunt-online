@@ -7,7 +7,10 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import FrontendSession
-from .matchmaking import unranked_add_to_queue, unranked_remove_from_queue, find_match_from_token
+from .matchmaking import unranked_add_to_queue, unranked_remove_from_queue, find_match_from_token, find_match_from_id
+from .redis_client import redis_client
+
+import json
 
 # Create your views here.
 
@@ -52,8 +55,7 @@ def enter_matchmaking(request):
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def exit_matchmaking(request):
-    token_str = request.headers.get("Authorization")
-    print("Auth received: ", token_str)
+    token_str = "Bearer " + json.loads(request.body.decode("utf-8")).get("token")
     token_status = verify_token(token_str)
     if (token_status != 1):
         return token_status
@@ -76,7 +78,7 @@ def matchmaking_status(request):
     token_str = token_str.split()[1]
     match = find_match_from_token(token_str)
     if match:
-        return Response({"status": "matched", "match_id": match.id})
+        return Response({"status": "matched", "match_id": match["match_id"]})
     return Response({"status": "waiting"})
 
 @csrf_exempt
@@ -88,7 +90,26 @@ def get_seed(request):
     if (token_status != 1):
         return token_status
     token_str = token_str.split()[1]
-    match = find_match_from_token(token_str)
+    match_id = request.headers.get("matchId")
+    match = find_match_from_id(match_id)
     if not match:
         return Response({"error": "no match with given token in get_seed()"})
-    return Response({"seed": match.seed})
+    if match["players"][token_str]["finished"]:
+        print("player finished fail")
+        return Response({"error": "can't grab seed, player has already finished game"})
+    if token_str not in match["players"]:
+        print("player not found fail")
+        return Response({"error": "can't grab seed, player not found in match"})
+    return Response({"seed": match["seed"]})
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def exit_match(request): # currently useless but ill keep it for now
+    token_str = "Bearer " + json.loads(request.body.decode("utf-8")).get("token")
+    token_status = verify_token(token_str)
+    if (token_status != 1):
+        return token_status
+    token_str = token_str.split()[1]
+
+    return Response({"status": "Exited match successfully."})

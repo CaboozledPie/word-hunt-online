@@ -1,8 +1,8 @@
 from urllib.parse import parse_qs
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
-from gameapi.models import FrontendSession  # wherever you defined it
-
+from django.utils import timezone
+from gameapi.models import FrontendSession
 
 @database_sync_to_async
 def get_session(token_str):
@@ -17,29 +17,27 @@ class TokenAuthMiddleware:
 
     def __init__(self, inner):
         self.inner = inner
-
-    def __call__(self, scope):
-        return TokenAuthMiddlewareInstance(scope, self.inner)
-
-
-class TokenAuthMiddlewareInstance:
-    def __init__(self, scope, inner):
-        self.scope = dict(scope)
-        self.inner = inner
-
-    async def __call__(self, receive, send):
-        query_string = self.scope.get("query_string", b"").decode()
+    
+    async def __call__(self, scope, receive, send):
+        # parse token from query string
+        query_string = scope.get("query_string", b"").decode()
         params = parse_qs(query_string)
         token = params.get("token", [None])[0]
 
+        scope["session"] = None
         if token:
-            session = await get_session(token)
+            session = await self._get_session(token)
             if session:
-                self.scope["session"] = session
-            else:
-                self.scope["session"] = None
-        else:
-            self.scope["session"] = None
+                scope["session"] = session
 
-        inner = self.inner(self.scope)
-        return await inner(receive, send)
+        return await self.inner(scope, receive, send)
+
+    @database_sync_to_async
+    def _get_session(self, token):
+        try:
+            return FrontendSession.objects.get(
+                token=token,
+                expires_at__gt=timezone.now()
+            )
+        except FrontendSession.DoesNotExist:
+            return None
