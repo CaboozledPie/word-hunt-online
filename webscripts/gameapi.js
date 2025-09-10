@@ -12,8 +12,11 @@ function connectSocket(matchId) { // returns match websocket, socket responses i
             const data = JSON.parse(event.data);
             switch (data.event) {
                 case "foundWord":
-                    if (data.player === token) return;
-                    console.log(`${data.player} found a word: ${data.word_info.word}`);
+                    if (data.player_id === token) return;
+                    console.log(`${data.player_id} found a word: ${data.word_info.word}`);
+                    console.log(data['player_data']);
+                    document.getElementById("opponentScore").textContent =
+                        `Points: ${data['player_data']['score']} Words: ${data['player_data']['word_count']}`;
                     break;
                 case "opponent_disconnect":
                     if (data.player === token) return; // this shouldnt even be possible but idk

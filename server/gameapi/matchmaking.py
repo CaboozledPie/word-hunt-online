@@ -18,11 +18,13 @@ def create_match(player1, player2): # this models what a data is in a match. SUB
                 "finished": False,
                 "last_seen": None,
                 "score": 0,
+                "word_count": 0,
             },
             player2["session"]: {
                 "finished": False,
                 "last_seen": None,
                 "score": 0,
+                "word_count": 0,
             },
         },
         "accounts": {

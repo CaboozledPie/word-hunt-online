@@ -237,20 +237,22 @@ Board.prototype.clearGuess = function() { // call every time mouse is released
     // check the guess
     if (this.evaluateGuess() == 1) {
         // give points
+        var scoreIncrement = 0;
         switch (this.currentWord.length) {
             case 3:
-                this.score += 100;
+                scoreIncrement = 100;
                 break;
             case 4:
-                this.score += 400;
+                scoreIncrement = 400;
                 break;
             case 5:
-                this.score += 800;
+                scoreIncrement = 800;
                 break;
             default:
-                this.score += 400 * this.currentWord.length - 1000
+                scoreIncrement = 400 * this.currentWord.length - 1000
                 break;
         }
+        this.score += scoreIncrement;
 
         // add to history
         var guess = "";
@@ -266,6 +268,7 @@ Board.prototype.clearGuess = function() { // call every time mouse is released
                 info: {
                     word: guess,
                     length: this.currentWord.length,
+                    score: this.score,
                 }
             }));
         }

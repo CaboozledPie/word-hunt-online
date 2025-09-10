@@ -64,14 +64,19 @@ class GameConsumer(AsyncWebsocketConsumer):
 
             case "foundWord":
                 word_info = data.get("info", {})
+                match = json.loads(redis_client.hget("matches:unranked", self.match_id))
+                match["players"][self.player_id]["score"] = word_info["score"]
+                match["players"][self.player_id]["word_count"] += 1
                 await self.channel_layer.group_send(
                     self.match_id,
                     {
                         "type": "found_word",
-                        "player": str(self.scope["session"].token),
+                        "player_id": str(self.scope["session"].token),
+                        "player_data": match["players"][self.player_id],
                         "data": word_info, 
                     }
                 )
+                redis_client.hset("matches:unranked", self.match_id, json.dumps(match))
             case _: # placeholder/default
                 await self.channel_layer.group_send(
                     self.match_id,
@@ -86,7 +91,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def found_word(self, event):
         await self.send(text_data=json.dumps({
             "event": "foundWord",
-            "player": event["player"],
+            "player_id": event["player_id"],
+            "player_data": event["player_data"],
             "word_info": event["data"]
         }))
 

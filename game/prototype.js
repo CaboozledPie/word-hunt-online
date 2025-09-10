@@ -212,6 +212,7 @@ export function startGame(seed, socket = null, timer = 80) {
                 document.getElementById("timer").textContent = `Time Remaining: ${remaining}`
             },
             () => { // called on timer end
+                socket.send(JSON.stringify({type: "gameFinished"}));
                 alert("out of time gg"); // SUBJECT TO CHANGE
             }
         );
