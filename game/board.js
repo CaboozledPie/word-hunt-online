@@ -103,7 +103,8 @@ Tile.prototype.getAnimationType = function() {
 };
 
 /**this board class is basically the entire game. everything relevant is in here.**/
-var Board = function(shape, skin = "skindefault", socket = null) { // input shape as 0 for unfilled, 1 for filled
+// input shape as 0 for unfilled, 1 for filled
+var Board = function(shape, skin = "skindefault", socket = null, score = 0, words = []) {
     if (shape.length !== shape[0].length) {
         throw new Error("board shape must be inputted as square for Board() constructor");
     }
@@ -111,10 +112,11 @@ var Board = function(shape, skin = "skindefault", socket = null) { // input shap
     this.skin = skin;
     this.currentWord = []; // array of arrays of length 2 [row, col]
     this.currentTile = []; // length 2, row and col
-    this.usedWords = new Set(); // hashmap for yellow
-    this.score = 0;
+    this.usedWords = new Set(words); // hashmap for yellow
+    this.score = score;
     this.key = []; // sorted list of answers
     this.socket = socket
+    this.takeInputs = true; // if timer <= 0, set to false
 };
 
 // make the board according to letter distribution (bag w/o replacement)
@@ -235,7 +237,7 @@ Board.prototype.selectTile = function(row, col) { // returns 1 if new tile selec
 
 Board.prototype.clearGuess = function() { // call every time mouse is released
     // check the guess
-    if (this.evaluateGuess() == 1) {
+    if (this.evaluateGuess() == 1 && this.takeInputs) {
         // give points
         var scoreIncrement = 0;
         switch (this.currentWord.length) {
@@ -341,6 +343,10 @@ Board.prototype.getScore = function() {
 
 Board.prototype.getWordCount = function() {
     return this.usedWords.size;
+};
+
+Board.prototype.turnOff = function() { // animations will still work, just no score
+    this.takeInputs = false;
 };
 
 var GameTimer = function(duration, onTick, onEnd) {

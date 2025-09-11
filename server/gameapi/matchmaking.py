@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 import threading
 import uuid
 import time
@@ -10,7 +11,7 @@ from .redis_client import redis_client
 #redis_client.rpush("matches:ranked")
 
 
-def create_match(player1, player2): # this models what a data is in a match. SUBJECT TO CHANGE 
+def create_match(player1, player2, duration = 80): # this models what a data is in a match. SUBJECT TO CHANGE 
     ret_dict = {
         "match_id": f"match_{uuid.uuid4()}",
         "players": {
@@ -19,12 +20,14 @@ def create_match(player1, player2): # this models what a data is in a match. SUB
                 "last_seen": None,
                 "score": 0,
                 "word_count": 0,
+                "found_words": [],
             },
             player2["session"]: {
                 "finished": False,
                 "last_seen": None,
                 "score": 0,
                 "word_count": 0,
+                "found_words": [],
             },
         },
         "accounts": {
@@ -33,6 +36,8 @@ def create_match(player1, player2): # this models what a data is in a match. SUB
         },
         "active": False,
         "seed": "",
+        "start_time": timezone.now().timestamp(),
+        "duration": duration,
     }
     for i in range(16): # this assumes 4x4 board dim! subject to change
         ret_dict["seed"] += '%02d' % random.randint(0, 99 - i)

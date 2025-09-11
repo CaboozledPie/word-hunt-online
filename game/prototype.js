@@ -202,17 +202,26 @@ const boardOffset = canvas.width / 20;
 const tileSize = (canvas.width - boardOffset * 2) / boardShape.length; // for our tests 200
 const tileOffset = tileSize / 20; // margin around each tile so theyre not hugging, purely visual
 
-export function startGame(seed, socket = null, timer = 80) {
+export function startGame(seed = null, socket = null, timer=80, player_cache = null) { // match contains settings
     // wait until dictionary is loaded before starting le game
     DICTIONARY_READY.then(() => {
         // even this behavior should probably be sectioned off later but for now it's going in here
-        var gameBoard = new Board(boardShape, "skindefault", socket);
+        if (!player_cache) { // match state
+            var gameBoard = new Board(boardShape, "skindefault", socket);
+        }
+        else { // blank, default
+            var gameBoard = new Board(boardShape, "skindefault", socket,
+                player_cache["score"], player_cache["found_words"]);
+        }
         var gameTimer = new GameTimer(timer,
             (remaining) => { // called each tick
                 document.getElementById("timer").textContent = `Time Remaining: ${remaining}`
             },
             () => { // called on timer end
-                socket.send(JSON.stringify({type: "gameFinished"}));
+                socket.send(JSON.stringify({
+                    type: "gameFinished",
+                }));
+                gameBoard.turnOff();
                 alert("out of time gg"); // SUBJECT TO CHANGE
             }
         );

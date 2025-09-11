@@ -21,6 +21,7 @@ def get_frontend_token(request):
     session = FrontendSession.objects.create()
     return Response({"token": str(session.token)})
 
+
 def verify_token(token):
     if not token or not token.startswith("Bearer "):
         return Response({"error": "Missing token"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -32,7 +33,15 @@ def verify_token(token):
 
     if session.expires_at < timezone.now():
         return Response({"error": "Token expired"}, status=status.HTTP_401_UNAUTHORIZED)
-    return 1
+    return Response({"status": "Token valid!"})
+
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def valid_token(request):
+    token_str = request.headers.get("Authorization")
+    token_status = verify_token(token_str)
+    return Response({"status": token_status.status_code == 200})
 
 @csrf_exempt
 @api_view(['POST'])
@@ -42,7 +51,7 @@ def enter_matchmaking(request):
     token_str = request.headers.get("Authorization")
     print("Auth received: ", token_str)
     token_status = verify_token(token_str)
-    if (token_status != 1):
+    if token_status.status_code != 200:
         return token_status
     token_str = token_str.split()[1]
     
@@ -57,7 +66,7 @@ def enter_matchmaking(request):
 def exit_matchmaking(request):
     token_str = "Bearer " + json.loads(request.body.decode("utf-8")).get("token")
     token_status = verify_token(token_str)
-    if (token_status != 1):
+    if token_status.status_code != 200:
         return token_status
     token_str = token_str.split()[1]
 
@@ -73,7 +82,7 @@ def matchmaking_status(request):
     token_str = request.headers.get("Authorization")
     print("Auth received: ", token_str)
     token_status = verify_token(token_str)
-    if (token_status != 1):
+    if token_status.status_code != 200:
         return token_status
     token_str = token_str.split()[1]
     match = find_match_from_token(token_str)
@@ -84,10 +93,10 @@ def matchmaking_status(request):
 @csrf_exempt
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
-def get_seed(request):
+def get_match(request):
     token_str = request.headers.get("Authorization")
     token_status = verify_token(token_str)
-    if (token_status != 1):
+    if token_status.status_code != 200:
         return token_status
     token_str = token_str.split()[1]
     match_id = request.headers.get("matchId")
@@ -100,7 +109,7 @@ def get_seed(request):
     if token_str not in match["players"]:
         print("player not found fail")
         return Response({"error": "can't grab seed, player not found in match"})
-    return Response({"seed": match["seed"]})
+    return Response({"data": match})
 
 @csrf_exempt
 @api_view(['POST'])
@@ -108,7 +117,7 @@ def get_seed(request):
 def exit_match(request): # currently useless but ill keep it for now
     token_str = "Bearer " + json.loads(request.body.decode("utf-8")).get("token")
     token_status = verify_token(token_str)
-    if (token_status != 1):
+    if token_status.status_code != 200:
         return token_status
     token_str = token_str.split()[1]
 
