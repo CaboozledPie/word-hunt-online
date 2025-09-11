@@ -192,3 +192,4 @@ window.initSession = initSession;
 window.enterMatchmaking = enterMatchmaking;
 window.exitMatchmaking = exitMatchmaking;
 window.connectSocket = connectSocket;
+window.pageClose = pageClose;

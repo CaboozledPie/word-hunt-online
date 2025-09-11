@@ -22,7 +22,7 @@
         const webSocket = await window.connectSocket(matchId);
         if (!webSocket) alert("could not connect to webSocket, token invalid");
         window.addEventListener("beforeunload", () => {
-            pageClose(sessionStorage.getItem("frontendToken"), webSocket);
+            window.pageClose(sessionStorage.getItem("frontendToken"), webSocket);
         });
     };
     document.addEventListener("DOMContentLoaded", () => {
